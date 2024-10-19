@@ -40,15 +40,15 @@ class PuzzleEnv(gym.Env):
         info = {}
 
         ''' compute new state'''
-        if self.__is_applicable__(action):
-            observation = self.__do_step__(action)
+        if self._is_applicable_(action):
+            observation = self._do_step_(action)
             info["message"] = "Action performed"
         else:
             observation = self.state
             info["message"] = "Action not applicable"
 
         ''' compute episode end / reward '''
-        terminated = self.__episode_terminated__()
+        terminated = self._episode_terminated_()
 
         ''' todo '''
         ''' Gymnasium requires truncated to be explicitly handled, assuming same as terminated '''
@@ -61,7 +61,7 @@ class PuzzleEnv(gym.Env):
         else:
             reward = -1
 
-        return observation, reward, terminated,truncated, info
+        return observation, reward, terminated, truncated, info
 
 
     def reset(self, seed=None, options=None):
@@ -78,7 +78,7 @@ class PuzzleEnv(gym.Env):
         return
 
 
-    def __is_applicable__(self, action):
+    def _is_applicable_(self, action):
 
         index_array = np.where(self.state == 0)
         row = index_array[0][0]
@@ -99,7 +99,7 @@ class PuzzleEnv(gym.Env):
         return possible
 
 
-    def __do_step__(self, action):
+    def _do_step_(self, action):
         index_array = np.where(self.state == 0)
         row = index_array[0][0]
         col = index_array[1][0]
@@ -125,6 +125,6 @@ class PuzzleEnv(gym.Env):
         return self.state
 
 
-    def __episode_terminated__(self):
+    def _episode_terminated_(self):
         final_state = np.array(np.arange(0,9)).reshape(3,3)
         return np.all(self.state == final_state)
