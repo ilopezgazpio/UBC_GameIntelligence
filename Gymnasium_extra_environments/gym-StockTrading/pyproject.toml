@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gym_StockTrading"
+version = "0.0.1"
+requires-python = ">=3.6"
+dependencies = [
+    "gymnasium",
+    "numpy",
+    "pandas"
+]
