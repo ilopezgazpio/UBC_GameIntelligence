@@ -46,15 +46,15 @@ class RiverCrossingEnv(gym.Env):
         info = {}
 
         ''' compute new state'''
-        if self._is_applicable_(action):
-            observation = self._do_step_(action)
+        if self.is_applicable(action):
+            observation = self.do_step(action)
             info["message"] = "Action performed"
         else:
             observation = self.state
             info["message"] = "Action not applicable"
 
         ''' compute episode end / reward '''
-        terminated = self._episode_terminated_()
+        terminated = self.episode_terminated()
 
         '''todo'''
         ''' Gymnasium requires both terminated and truncated '''
@@ -84,7 +84,7 @@ class RiverCrossingEnv(gym.Env):
         return
 
 
-    def _is_applicable_(self, action):
+    def is_applicable(self, action):
 
         if action == 0: # farmer
             possible = (self.state[1] != self.state[2]) and (self.state[2] != self.state[3])
@@ -101,7 +101,7 @@ class RiverCrossingEnv(gym.Env):
         return possible
 
 
-    def _do_step_(self, action):
+    def do_step(self, action):
         # Farmer always moves
         self.state[0] -= 1
 
@@ -113,5 +113,5 @@ class RiverCrossingEnv(gym.Env):
         return self.state
 
 
-    def _episode_terminated_(self):
+    def episode_terminated(self):
         return np.all(self.state == 1)
