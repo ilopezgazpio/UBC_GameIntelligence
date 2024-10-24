@@ -19,8 +19,8 @@
 #---------------------------
 import gymnasium as gym
 from SimpleBaselines.frontier.Node import Node
-from SimpleBaselines.agent.Blind_UCS_Tree_Agent import Blind_UCS_Tree_Agent
-from SimpleBaselines.agent.Blind_UCS_Graph_Agent import Blind_UCS_Graph_Agent
+from SimpleBaselines.agent.blindsearch_tree_agents.Blind_UCS_Tree_Agent import Blind_UCS_Tree_Agent
+from SimpleBaselines.agent.blindsearch_graph_agents.Blind_UCS_Graph_Agent import Blind_UCS_Graph_Agent
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -96,8 +96,8 @@ plt.show()
 
 Expanded = pd.concat(
     [
-       blind_ucs_tree_agent.reporting.log['Expanded'],
-       blind_ucs_graph_agent.reporting.log['Expanded']
+       blind_ucs_tree_agent.reporting.log['Expanded'].fillna(0),
+       blind_ucs_graph_agent.reporting.log['Expanded'].fillna(0)
     ] , axis=1
 )
 Expanded.columns = ["Expanded Tree", "Expanded Graph"]
