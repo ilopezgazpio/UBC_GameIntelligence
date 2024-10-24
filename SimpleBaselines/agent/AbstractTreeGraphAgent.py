@@ -4,7 +4,7 @@ from gymnasium import spaces
 from copy import deepcopy
 from SimpleBaselines.frontier.Node import Node
 from SimpleBaselines.frontier.Frontier import Frontier
-from SimpleBaselines.reporting.Report import Report
+from SimpleBaselines.reporting.TreeGraphReport import TreeGraphReport
 
 class AbstractTreeGraphAgent(ABC):
 
@@ -13,7 +13,7 @@ class AbstractTreeGraphAgent(ABC):
         self.initial_node = None
         self.final_node = None
         self.frontier = Frontier()
-        self.reporting = Report()
+        self.reporting = TreeGraphReport()
         self.wrapped_env = False
 
 

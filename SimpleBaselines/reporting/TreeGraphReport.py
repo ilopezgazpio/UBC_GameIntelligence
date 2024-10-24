@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-class Report:
+class TreeGraphReport:
 
     '''
     Class to handle all reporting and logging information for an agent
