@@ -7,7 +7,6 @@ State class is a wrapper for an environment including additional features for ob
 class State:
 
     def __init__(self,
-                 env: gym.Env = None,
                  observation = None,
                  info=None,
                  step = 0,
@@ -21,7 +20,6 @@ class State:
                  action_history = [],
                  ):
 
-        self.env = env
         self.observation = observation
         self.info = info
         self.step = step

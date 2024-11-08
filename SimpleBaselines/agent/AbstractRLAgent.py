@@ -11,57 +11,33 @@ import numpy as np
 
 class AbstractRLAgent(ABC):
 
-    def __init__(self):
+    def __init__(self, env:gym.Env):
         self.initial_state = None
         self.final_state = None
         self.current_state = None
         self.reporting = RLReport()
         self.wrapped_env = False
 
-        ''' Parameters for the Q-Learning algorithm '''
-        self.Q = None
-        self.gamma = None
-        self.number_states = None
-        self.number_actions = None
+        '''Common Parameters for all RL agents'''
+        self.env = env
 
-        '''Parameters for the Stochastic Q-Learning algorithm'''
-        self.learning_rate = None
-
-        '''Parameters for the Epsilon-Greedy Q-Learning algorithm'''
-        self.egreedy = None
-        self.egreedy_final = None
-        self.egreedy_decay = None
-
-
-        '''Parameters for the Value Iteration Learning algorithm'''
-        self.V = None
-        self.V_init_steps = 2000
-        self.policy = None
-
-
-        ''' Parameters for the DQN algorithm '''
-        self.hidden_layer_size = None
-        self.input_layer_size = None
-        self.output_layer_size = None
 
     def __printlog__(self, print_every=100):
         if (self.current_state.step % print_every == 0):
             print(self.reporting.log.tail(1))
 
 
-    def __play__(self, max_steps=5000):
+    def __play__(self, max_steps=5000, seed=None):
         '''
         This method implements the main loop and must be implemented with the particularities of each RL agent
         '''
-
-        self.current_state = self.initial_state
 
         while not (self.current_state.terminated or self.current_state.truncated) and self.current_state.step <= max_steps:
 
             action = self.__action_decision_function__(self.current_state)
 
             # Take action
-            observation, reward, terminated, truncated, info = self.current_state.env.step(action)
+            observation, reward, terminated, truncated, info = self.env.step(action)
 
             # Update agent before removing old state
             # current_state is the old state (it will update next)
@@ -91,11 +67,17 @@ class AbstractRLAgent(ABC):
         if self.current_state.terminated or self.current_state.truncated or self.current_state.step > max_steps:
             self.final_state = self.current_state
 
+    def reset_env(self, seed=None):
+        observation, info = self.env.reset(seed=seed)
+        self.initial_state = State(observation=observation, info=info)
+        self.current_state = self.initial_state
+        self.final_state = None
+
 
     def __action_decision_function__(self, state: State):
         pass
 
 
-    def __update_function__(self, old_state: State, new_observation : gym.Space, action, reward: float):
+    def __update_function__(self, old_state: State, new_observation : gym.Space, action :gym.Space, reward: float):
         pass
 

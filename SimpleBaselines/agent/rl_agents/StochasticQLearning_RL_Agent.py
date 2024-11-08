@@ -6,18 +6,23 @@ import torch
 
 class StochasticQLearning_RL_Agent(AbstractRLAgent):
 
-    def __init__(self, env:gym.Env, gamma=0.95, learning_rate=0.95):
-        super().__init__()
-        self.number_states = env.observation_space.n
-        self.number_actions = env.action_space.n
+    def __init__(self, env:gym.Env, seed=None, gamma=0.95, learning_rate=0.95):
+        super().__init__(env)
+        self.reset_env(seed=seed)
 
-        self.Q = torch.zeros([self.number_states, self.number_actions])
+        '''Parameters for the Stochastic Q-Learning algorithm'''
+        self.Q = torch.zeros([self.env.observation_space.n, self.env.action_space.n])
         self.gamma = gamma
         self.learning_rate = learning_rate
 
+        # Set action decision function
+        # Stochastic QLearning agent plays as a Q-Based policy sampling from Q-table
+        # Q table updates following the stochastic scenario Bellman equation
+        self.__action_decision_function__ = self.__StochasticQLearning_decision_function__
+        self.__update_function__ = self.__StochasticQLearning_bellman_update__
 
     def __StochasticQLearning_decision_function__(self, old_state: State):
-        random_values = self.Q[old_state.observation] + torch.rand(1, self.number_actions) / 1000
+        random_values = self.Q[old_state.observation] + torch.rand(1, self.env.action_space.n) / 1000
         ''' MAX Q(S', A') '''
         action = torch.max(random_values, 1)[1][0]
         return action.item()
@@ -36,14 +41,5 @@ class StochasticQLearning_RL_Agent(AbstractRLAgent):
 
 
     def play(self, environment:gym.Env, max_steps=5000, seed=None):
-        # Set action decision function
-        # Stochastic QLearning agent plays as a Q-Based policy sampling from Q-table
-        # Q table updates following the stochastic scenario Bellman equation
-        observation, info = environment.reset(seed=seed)
-        self.initial_state = State(env=environment, observation=observation, info=info)
-        self.current_state = None
-        self.final_state = None
         self.step = 0
-        self.__action_decision_function__ = self.__StochasticQLearning_decision_function__
-        self.__update_function__ = self.__StochasticQLearning_bellman_update__
         super().__play__(max_steps)

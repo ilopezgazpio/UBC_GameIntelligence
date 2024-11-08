@@ -6,17 +6,23 @@ import torch
 
 class EpsilonGreedyQLearning_RL_Agent(AbstractRLAgent):
 
-    def __init__(self, env:gym.Env, gamma=0.95, learning_rate=0.99, egreedy=0.7, egreedy_final=0.1, egreedy_decay=0.9999):
-        super().__init__()
-        self.number_states = env.observation_space.n
-        self.number_actions = env.action_space.n
+    def __init__(self, env:gym.Env, seed=None, gamma=0.95, learning_rate=0.99, egreedy=0.7, egreedy_final=0.1, egreedy_decay=0.9999):
+        super().__init__(env)
+        self.reset_env(seed=seed)
 
-        self.Q = torch.zeros([self.number_states, self.number_actions])
+        '''Parameters for the Epsilon-Greedy Q-Learning algorithm'''
+        self.Q = torch.zeros([self.env.observation_space.n, self.env.action_space.n])
         self.gamma = gamma
         self.learning_rate = learning_rate
         self.egreedy = egreedy
         self.egreedy_final = egreedy_final
         self.egreedy_decay = egreedy_decay
+
+        # Set action decision function
+        # Stochastic QLearning agent plays as a Q-Based policy sampling from Q-table
+        # Q table updates following the stochastic scenario Bellman equation
+        self.__action_decision_function__ = self.__EpsilonGreedyQLearning_decision_function__
+        self.__update_function__ = self.__EpsilonGreedyQLearning_bellman_update__
 
 
     def __EpsilonGreedyQLearning_decision_function__(self, old_state: State):
@@ -27,7 +33,7 @@ class EpsilonGreedyQLearning_RL_Agent(AbstractRLAgent):
             # Explotation
             # Observe Q and exploit best action MAX Q (S', A')
             ''' MAX Q(S', A') '''
-            random_values = self.Q[old_state.observation] + torch.rand(1, self.number_actions) / 1000
+            random_values = self.Q[old_state.observation] + torch.rand(1, self.env.action_space.n) / 1000
             action = torch.argmax(random_values, dim=1).item()
 
         else:
@@ -56,15 +62,6 @@ class EpsilonGreedyQLearning_RL_Agent(AbstractRLAgent):
         self.Q[old_state.observation, action] = (1 - self.learning_rate) * current_memory + self.learning_rate * input_gate
 
 
-    def play(self, environment:gym.Env, max_steps=5000, seed=None):
-        # Set action decision function
-        # Stochastic QLearning agent plays as a Q-Based policy sampling from Q-table
-        # Q table updates following the stochastic scenario Bellman equation
-        observation, info = environment.reset(seed=seed)
-        self.initial_state = State(env=environment, observation=observation, info=info)
-        self.current_state = None
-        self.final_state = None
+    def play(self, max_steps=5000, seed=None):
         self.step = 0
-        self.__action_decision_function__ = self.__EpsilonGreedyQLearning_decision_function__
-        self.__update_function__ = self.__EpsilonGreedyQLearning_bellman_update__
         super().__play__(max_steps)
