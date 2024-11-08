@@ -26,16 +26,17 @@ rewards_total = list()
 steps_total = list()
 
 # Create the agent
-ValueIteration_agent = ValueIterationLearning_RL_Agent(env=env)
-ValueIteration_agent.initial_state = env
+ValueIteration_agent = ValueIterationLearning_RL_Agent(env=env, seed=seed)
 ValueIteration_agent.__ValueIterationLearning_init_V_table_init_policy__()
 
 
 # Play the game
 for episode in range(num_episodes):
 
+    ValueIteration_agent.reset_env(seed=seed)
+
     # Play the game
-    ValueIteration_agent.play(environment=env, max_steps=5000, seed=seed)
+    ValueIteration_agent.play(max_steps=5000, seed=seed)
 
     # Print some reporting
     # ValueIteration_agent.reporting.print_short_report()

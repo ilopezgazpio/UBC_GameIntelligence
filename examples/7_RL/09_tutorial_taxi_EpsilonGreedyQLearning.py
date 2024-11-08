@@ -26,13 +26,15 @@ rewards_total = list()
 steps_total = list()
 
 # Create the agent
-agent = EpsilonGreedyQLearning_RL_Agent(env=env, gamma=0.98, learning_rate=0.85, egreedy=0.05, egreedy_final=0.01, egreedy_decay=0.999)
+agent = EpsilonGreedyQLearning_RL_Agent(env=env, seed=seed, gamma=0.98, learning_rate=0.85, egreedy=0.05, egreedy_final=0.01, egreedy_decay=0.999)
 
 # Play the game
 for episode in range(num_episodes):
 
-    # Play the game
-    agent.play(environment=env, max_steps=5000, seed=seed)
+    agent.reset_env(seed=seed)
+
+    # Play the game (new environment for each run with continuously learning agent)
+    agent.play(max_steps=5000, seed=seed)
 
     # Print some reporting
     # ValueIteration_agent.reporting.print_short_report()

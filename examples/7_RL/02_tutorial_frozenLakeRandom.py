@@ -26,10 +26,10 @@ steps_total = list()
 for episode in range(num_episodes):
 
     # Create the agent
-    random_agent = Random_RL_Agent()
+    random_agent = Random_RL_Agent(env)
 
     # Play the game
-    random_agent.play(environment=env, max_steps=5000, seed=seed)
+    random_agent.play(max_steps=5000, seed=seed)
 
     # Print some reporting
     random_agent.reporting.print_short_report()

@@ -26,13 +26,15 @@ rewards_total = list()
 steps_total = list()
 
 # Create the agent
-QLearning_agent = QLearning_RL_Agent(env=env)
+QLearning_agent = QLearning_RL_Agent(env=env, seed=seed)
 
 # Play the game
 for episode in range(num_episodes):
 
-    # Play the game
-    QLearning_agent.play(environment=env, max_steps=5000, seed=seed)
+    QLearning_agent.reset_env(seed=seed)
+
+    # Play the game (new environment for each run with continuously learning agent)
+    QLearning_agent.play(max_steps=5000, seed=seed)
 
     # Print some reporting
     # QLearning_agent.reporting.print_short_report()
