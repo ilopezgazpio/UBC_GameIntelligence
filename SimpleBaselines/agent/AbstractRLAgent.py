@@ -59,7 +59,7 @@ class AbstractRLAgent(ABC):
             self.reporting.__append__(self.current_state.terminated, self.current_state.truncated,
                                       self.current_state.reward, self.current_state.action, self.current_state.step,
                                       self.current_state.cumulative_reward)
-            self.__printlog__(print_every=10000)
+            #self.__printlog__(print_every=10000)
 
             self.current_state.step += 1
 
