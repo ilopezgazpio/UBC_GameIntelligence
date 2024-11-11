@@ -4,12 +4,6 @@ import gymnasium as gym
 import matplotlib.pyplot as plt
 import torch
 
-## import the agent from ../../SimpleBaselines/agent/rl_agents/Random_RL_Agent.py
-import sys
-import os
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(SCRIPT_DIR + "/../../")
 from SimpleBaselines.agent.rl_agents.EpsilonGreedyQLearning_RL_Agent import EpsilonGreedyQLearning_RL_Agent
 
 env = gym.make("LunarLander-v3", continuous=False, gravity=-10.0,
