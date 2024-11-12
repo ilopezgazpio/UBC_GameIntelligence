@@ -28,7 +28,7 @@ class QLearning_RL_Agent(AbstractRLAgent):
         return action.item()
 
 
-    def __QLearning_bellman_update__(self, old_state: State, new_observation: gym.Space, action, reward: float):
+    def __QLearning_bellman_update__(self, old_state: State, new_observation: gym.Space, action, reward: float, terminated: bool, truncated: bool):
         '''Bellman equation update'''
         self.Q[old_state.observation, action] = reward + self.gamma * torch.max(self.Q[new_observation])
 
