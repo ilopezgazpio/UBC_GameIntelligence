@@ -86,9 +86,14 @@ for episode in range(num_episodes):
             elapsed_time = time.time() - start_time
             print("-----------------")
             print("Episode: {}".format(episode))
-            print("Average Reward [last {}]: {:.2f}".format(report_interval, sum(steps_total[-report_interval:]) / report_interval))
-            print("Average Reward [last 100]: {:.2f}".format(sum(steps_total[-100:]) / 100))
-            print("Average Reward: {:.2f}".format(sum(steps_total) / len(steps_total)))
+            print("Average Reward [last {}]: {:.2f}".format(report_interval, sum(rewards_total[-report_interval:]) / report_interval))
+            print("Average Reward [last 100]: {:.2f}".format(sum(rewards_total[-100:]) / 100))
+            print("Average Reward: {:.2f}".format(sum(rewards_total) / len(steps_total)))
+
+            print("Average Steps [last {}]: {:.2f}".format(report_interval, sum(steps_total[-report_interval:]) / report_interval))
+            print("Average Steps [last 100]: {:.2f}".format(sum(steps_total[-100:]) / 100))
+            print("Average Steps: {:.2f}".format(sum(steps_total) / len(steps_total)))
+
             print("Epsilon: {:.2f}".format(agent.egreedy))
             print("Frames Total: {}".format(agent.current_state.step))
             print(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(elapsed_time))}")
@@ -107,8 +112,8 @@ rewards_total = np.array(rewards_total)
 steps_total = np.array(steps_total)
 egreedy_total = np.array(egreedy_total)
 
-print("Average reward: {}".format( sum(steps_total) / num_episodes) )
-print("Average reward (last 100 episodes): {}".format( sum(steps_total[-100:]) / 100) )
+print("Average reward: {}".format( sum(rewards_total) / num_episodes) )
+print("Average reward (last 100 episodes): {}".format( sum(rewards_total[-100:]) / 100) )
 print("Percent of episodes finished successfully: {}".format( sum(rewards_total > STEPS_TO_SOLVE) / num_episodes) )
 print("Percent of episodes finished successfully (last 100 episodes): {}".format( sum(rewards_total[-100:] > STEPS_TO_SOLVE) / 100) )
 print("Average number of steps: {}".format( sum(steps_total)/num_episodes) )

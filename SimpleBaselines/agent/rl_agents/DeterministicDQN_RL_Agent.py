@@ -67,8 +67,6 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
     def __DQN_decision_function__(self, state: State):
         ''' Epsilon greedy implementation '''
 
-        self.update_egreedy()
-
         if random.random() > self.egreedy:
             # Explotation. Observe Q and exploit best action MAX Q (S', A') as estimation of internal NN
             ''' MAX Q(S', A') '''
@@ -111,3 +109,4 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
 
     def play(self, max_steps=5000, seed=None):
         super().__play__(max_steps)
+        self.update_egreedy()
