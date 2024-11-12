@@ -28,12 +28,14 @@ class NeuralNetwork(nn.Module):
         if seed is not None:
             torch.manual_seed(seed)
             random.seed(seed)
+            random.seed(seed)
 
         # Build layer sizes list
         layer_sizes = [input_layer_size] + hidden_layers_size + [output_layer_size]
 
         # NN structure
         self.network = self.build_layers(layer_sizes, activation_fn, dropout, use_batch_norm)
+        print(self.network)
 
         # GPU capabilities
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
