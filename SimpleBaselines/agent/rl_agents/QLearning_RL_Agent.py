@@ -34,6 +34,5 @@ class QLearning_RL_Agent(AbstractRLAgent):
 
 
     def play(self, max_steps=5000, seed=None):
-        self.step = 0
         super().__play__(max_steps)
 
