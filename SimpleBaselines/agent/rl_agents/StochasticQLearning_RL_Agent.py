@@ -28,7 +28,7 @@ class StochasticQLearning_RL_Agent(AbstractRLAgent):
         return action.item()
 
 
-    def __StochasticQLearning_bellman_update__(self, old_state: State, new_observation : gym.Space, action, reward: float):
+    def __StochasticQLearning_bellman_update__(self, old_state: State, new_observation : gym.Space, action, reward: float, ºterminated: bool, truncated: bool):
         '''Stochastic Bellman equation update
            Current memory cell (left part of Stochastic Q-learning equation) '''
         current_memory = self.Q[old_state.observation, action]
