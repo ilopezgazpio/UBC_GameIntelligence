@@ -15,8 +15,6 @@ class State:
                  cumulative_reward = 0,
                  terminated = False,
                  truncated = False,
-                 utility = 0,
-                 cost = 0, # accumulative sum of rewards
                  action_history = [],
                  ):
 
