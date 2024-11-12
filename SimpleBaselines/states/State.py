@@ -26,6 +26,4 @@ class State:
         self.cumulative_reward = cumulative_reward
         self.terminated = terminated
         self.truncated = truncated
-        self.utility = utility
-        self.cost = cost
         self.action_history = action_history

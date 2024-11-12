@@ -12,7 +12,6 @@ class Random_RL_Agent(AbstractRLAgent):
         self.initial_state = State(observation=observation, info=info)
         self.current_state = self.initial_state
         self.final_state = None
-        self.step = 0
 
         # Set action decision function
         # Random agent plays as a random policy sampling from env.action_space.sample()
