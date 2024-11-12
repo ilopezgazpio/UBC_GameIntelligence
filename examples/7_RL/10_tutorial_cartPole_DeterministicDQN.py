@@ -35,7 +35,6 @@ rewards_total = list()
 steps_total = list()
 egreedy_total = list()
 solved_after = 0
-solved = False
 start_time = time.time()
 
 # Reporting parameters
@@ -93,18 +92,21 @@ for episode in range(num_episodes):
             #egreedy_total.append(agent.egreedy)
             mean_reward_100 = sum(steps_total[-100:]) / min(len(steps_total), 100)
 
-            if mean_reward_100 > STEPS_TO_SOLVE and not solved:
-                print(f"SOLVED! After {episode} episodes")
+            if mean_reward_100 > STEPS_TO_SOLVE and solved_after == 0:
+                print("*************************")
+                print("SOLVED! After {} episodes".format(episode))
+                print("*************************")
                 solved_after = episode
-                solved = True
 
             if episode % report_interval == 0:
                 elapsed_time = time.time() - start_time
-                print(f"\n*** Episode {episode} *** \
-                      \nAv.reward [last {report_interval}]: {sum(steps_total[-report_interval:]) / report_interval:.2f} \
-                      \n[last 100]: {mean_reward_100:.2f} \
-                      \n[all]: {sum(steps_total) / len(steps_total):.2f} \
-                      \nepsilon: {agent.egreedy:.2f} frames_total: {agent.current_state.step}")
+                print("-----------------")
+                print("Episode: {}".format(episode))
+                print("Average Reward [last {}]: {:.2f}".format(report_interval, sum(steps_total[-report_interval:]) / report_interval))
+                print("Average Reward [last 100]: {:.2f}".format(sum(steps_total[-10:]) / 100))
+                print("Average Reward: {:.2f}".format(sum(steps_total) / len(steps_total)))
+                print("Epsilon: {:.2f}".format(agent.egreedy))
+                print("Frames Total: {}".format(agent.current_state.step))
                 print(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(elapsed_time))}")
             break
 
