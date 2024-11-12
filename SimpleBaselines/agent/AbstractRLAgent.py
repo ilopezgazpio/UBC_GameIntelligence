@@ -42,11 +42,11 @@ class AbstractRLAgent(ABC):
 
             # Update agent before removing old state
             # current_state is the old state (it will update next)
-            # observation is the new observation
             # action is the performed action in self.current_state
+            # observation is the new observation
             # reward is the reward obtained in self.current_state performing action
             # terminated and truncated refer to the game state after performing action on current state
-            self.__update_function__(self.current_state, observation, action, reward, terminated, truncated)
+            self.__update_function__(self.current_state, action, observation, reward, terminated, truncated)
 
             # Update current state
             self.current_state.observation = observation
