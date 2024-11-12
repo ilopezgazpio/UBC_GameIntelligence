@@ -57,7 +57,8 @@ class ValueIterationLearning_RL_Agent(AbstractRLAgent):
         for action_possible in range( self.env.action_space.n ):
 
             # Explore hypothetical action
-            for prob, new_state, reward, _ in self.env.env.P[old_state.observation][action_possible]:
+            # caution! acccess to P is a bit tricky, we have to go through 4 levels of dictionaries (not consistent through gym environments)
+            for prob, new_state, reward, _ in self.env.env.env.env.P[old_state.observation][action_possible]:
                 actions_V[action_possible] += (prob * (reward + self.gamma * self.V[new_state]))
 
         max_value, index = torch.max(actions_V, 0)
@@ -72,5 +73,4 @@ class ValueIterationLearning_RL_Agent(AbstractRLAgent):
 
 
     def play(self, max_steps=5000, seed=None):
-        self.step = 0
         super().__play__(max_steps)
