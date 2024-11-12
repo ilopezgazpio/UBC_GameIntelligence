@@ -34,7 +34,6 @@ print('Action space sample:', env.action_space.sample())
 rewards_total = list()
 steps_total = list()
 egreedy_total = list()
-frames_total = 0
 solved_after = 0
 solved = False
 start_time = time.time()
@@ -73,7 +72,6 @@ for episode in range(num_episodes):
     # agent.reporting.print_report()
     while True:
         agent.current_state.step += 1
-        frames_total += 1
         agent.update_egreedy()
         action = agent.__DQN_decision_function__(agent.current_state)
         new_state, reward, terminated, truncated, _ = agent.env.step(action)
@@ -106,7 +104,7 @@ for episode in range(num_episodes):
                       \nAv.reward [last {report_interval}]: {sum(steps_total[-report_interval:]) / report_interval:.2f} \
                       \n[last 100]: {mean_reward_100:.2f} \
                       \n[all]: {sum(steps_total) / len(steps_total):.2f} \
-                      \nepsilon: {agent.egreedy:.2f} frames_total: {frames_total}")
+                      \nepsilon: {agent.egreedy:.2f} frames_total: {agent.current_state.step}")
                 print(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(elapsed_time))}")
             break
 
@@ -124,24 +122,12 @@ rewards_total = np.array(rewards_total)
 steps_total = np.array(steps_total)
 egreedy_total = np.array(egreedy_total)
 
-print("Average reward: {}".format(
-    sum(steps_total) / num_episodes)
-)
-print("Average reward (last 100 episodes): {}".format(
-    sum(steps_total[-100:]) / 100)
-)
-print("Percent of episodes finished successfully: {}".format(
-    sum(rewards_total > STEPS_TO_SOLVE) / num_episodes)
-)
-print("Percent of episodes finished successfully (last 100 episodes): {}".format(
-    sum(rewards_total[-100:] > STEPS_TO_SOLVE) / 100)
-)
-print("Average number of steps: {}".format(
-    sum(steps_total)/num_episodes)
-)
-print("Average number of steps (last 100 episodes): {}".format(
-    sum(steps_total[-100:])/100)
-)
+print("Average reward: {}".format( sum(steps_total) / num_episodes) )
+print("Average reward (last 100 episodes): {}".format( sum(steps_total[-100:]) / 100) )
+print("Percent of episodes finished successfully: {}".format( sum(rewards_total > STEPS_TO_SOLVE) / num_episodes) )
+print("Percent of episodes finished successfully (last 100 episodes): {}".format( sum(rewards_total[-100:] > STEPS_TO_SOLVE) / 100) )
+print("Average number of steps: {}".format( sum(steps_total)/num_episodes) )
+print("Average number of steps (last 100 episodes): {}".format( sum(steps_total[-100:])/100) )
 
 plt.figure(figsize=(12,5))
 plt.title("Rewards")
