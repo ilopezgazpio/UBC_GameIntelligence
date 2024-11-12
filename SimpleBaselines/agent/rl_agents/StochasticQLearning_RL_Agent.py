@@ -41,5 +41,4 @@ class StochasticQLearning_RL_Agent(AbstractRLAgent):
 
 
     def play(self, environment:gym.Env, max_steps=5000, seed=None):
-        self.step = 0
         super().__play__(max_steps)
