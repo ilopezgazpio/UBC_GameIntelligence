@@ -43,7 +43,7 @@ class EpsilonGreedyQLearning_RL_Agent(AbstractRLAgent):
             probabilities = torch.softmax(q_values, dim=0)
             action = torch.multinomial(probabilities, 1).item()
 
-        # Epsilon greedy weight decay
+        # Simple epsilon greedy weight decay
         if self.egreedy and self.egreedy_final and self.egreedy_decay and self.egreedy > self.egreedy_final:
             self.egreedy *= self.egreedy_decay
 
@@ -63,5 +63,4 @@ class EpsilonGreedyQLearning_RL_Agent(AbstractRLAgent):
 
 
     def play(self, max_steps=5000, seed=None):
-        self.step = 0
         super().__play__(max_steps)
