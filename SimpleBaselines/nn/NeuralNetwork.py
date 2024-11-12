@@ -1,9 +1,7 @@
 import random
-
 import numpy as np
 import torch
 import torch.nn as nn
-
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
@@ -15,14 +13,15 @@ class NeuralNetwork(nn.Module):
             self,
             input_layer_size,
             output_layer_size,
-            hidden_layers_size=None,
+            hidden_layers_size=[64],
             activation_fn=nn.Tanh,
-            learning_rate=0.001,
+            learning_rate=0.01,
             dropout=0.0,
             use_batch_norm=False,
             loss_fn=nn.MSELoss,
             optimizer=optim.Adam,
-            seed=None,):
+            seed=None
+    ):
 
         super(NeuralNetwork, self).__init__()
 
@@ -36,14 +35,13 @@ class NeuralNetwork(nn.Module):
         # NN structure
         self.network = self.build_layers(layer_sizes, activation_fn, dropout, use_batch_norm)
 
-        # Parameters for optimization
-        self.loss_fn = loss_fn()
-        self.optimizer = optimizer(params=self.parameters(), lr=learning_rate)
-
-
         # GPU capabilities
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.to(self.device)
+
+        # Parameters for optimization
+        self.loss_fn = loss_fn()
+        self.optimizer = optimizer(params=self.network.parameters(), lr=learning_rate)
 
 
 
@@ -64,7 +62,7 @@ class NeuralNetwork(nn.Module):
             if use_batch_norm and i < num_layers - 1:
                 layers.append(nn.BatchNorm1d(layer_sizes[i + 1]))
 
-            # Apply activation function if not on the output layer
+            # Apply activation function
             if i < num_layers - 1 and activation_fn is not None:
                 layers.append(activation_fn())
 
@@ -76,10 +74,12 @@ class NeuralNetwork(nn.Module):
         return nn.Sequential(*layers)
 
 
-    def forward(self, observation : np.array):
-        observation = torch.Tensor(observation).to(self.device)
-        return self.network(observation)
 
+    def toDevice(self, x : np.array, dType=torch.float32):
+        return torch.tensor(x, dtype=dType).to(self.device)
+
+    def forward(self, x):
+        return self.network(x)
 
     def update_NN(self, predicted_value, target_value):
         'Update the weights of the NN'

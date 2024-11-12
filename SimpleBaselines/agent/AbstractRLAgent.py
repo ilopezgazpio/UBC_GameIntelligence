@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import sys
 import gym
 import torch
 import gymnasium
@@ -42,9 +43,10 @@ class AbstractRLAgent(ABC):
             # Update agent before removing old state
             # current_state is the old state (it will update next)
             # observation is the new observation
-            # action is the performed action in current_state
-            # reward is the reward obtained in current_state performing action
-            self.__update_function__(self.current_state, observation, action, reward)
+            # action is the performed action in self.current_state
+            # reward is the reward obtained in self.current_state performing action
+            # terminated and truncated refer to the game state after performing action on current state
+            self.__update_function__(self.current_state, observation, action, reward, terminated, truncated)
 
             # Update current state
             self.current_state.observation = observation
@@ -73,11 +75,10 @@ class AbstractRLAgent(ABC):
         self.current_state = self.initial_state
         self.final_state = None
 
-
     def __action_decision_function__(self, state: State):
         pass
 
 
-    def __update_function__(self, old_state: State, new_observation : gym.Space, action :gym.Space, reward: float):
+    def __update_function__(self, old_state: State, action :gym.Space, new_observation : gym.Space, reward: float, terminated: bool, truncated: bool):
         pass
 
