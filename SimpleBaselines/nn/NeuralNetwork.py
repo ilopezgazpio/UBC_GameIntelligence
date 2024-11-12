@@ -46,7 +46,6 @@ class NeuralNetwork(nn.Module):
         self.optimizer = optimizer(params=self.network.parameters(), lr=learning_rate)
 
 
-
     def build_layers(self, layer_sizes, activation_fn, dropout, use_batch_norm):
 
         # Build layers using nn.Sequential
@@ -76,12 +75,13 @@ class NeuralNetwork(nn.Module):
         return nn.Sequential(*layers)
 
 
-
     def toDevice(self, x : np.array, dType=torch.float32):
         return torch.tensor(x, dtype=dType).to(self.device)
 
+
     def forward(self, x):
         return self.network(x)
+
 
     def update_NN(self, predicted_value, target_value):
         'Update the weights of the NN'

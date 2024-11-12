@@ -57,14 +57,11 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
         )
 
 
-
     def update_egreedy(self):
         # Epsilon greedy weight decay
         self.total_steps += 1
         if self.egreedy and self.egreedy_final and self.egreedy_decay and self.egreedy > self.egreedy_final:
-            self.egreedy = self.egreedy_final + (
-                    self.egreedy - self.egreedy_final
-            ) * math.exp( -1. * self.total_steps / self.egreedy_decay )
+            self.egreedy = self.egreedy_final + ( self.egreedy - self.egreedy_final ) * math.exp( -1. * self.total_steps / self.egreedy_decay )
 
 
     def __DQN_decision_function__(self, state: State):
@@ -79,16 +76,15 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
                 action = torch.argmax(q_values).item()
 
         else:
-            # Exploration
-            # pseudo random move
+            # Exploration / pseudo random move
              action = self.env.action_space.sample()
 
         return action
 
 
     def __DQN_bellman_update__(self, old_state: State, action, new_observation : gym.Space, reward: float, terminated, truncated):
-        '''DQN Bellman equation update'''
 
+        '''DQN Bellman equation update'''
         old_observation_tensor = self.QNetwork.toDevice(old_state.observation)
         new_observation_tensor = self.QNetwork.toDevice(new_observation)
         reward = self.QNetwork.toDevice([reward])
