@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 import sys
-import gym
 import torch
 import gymnasium
 from gymnasium import spaces
