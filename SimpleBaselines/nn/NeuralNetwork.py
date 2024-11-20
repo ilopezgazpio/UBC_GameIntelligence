@@ -76,7 +76,9 @@ class NeuralNetwork(nn.Module):
 
 
     def toDevice(self, x : np.array, dType=torch.float32):
-        return torch.tensor(x, dtype=dType).to(self.device)
+        # return torch.tensor(x, dtype=dType).to(self.device)
+        x = np.array(x)
+        return torch.from_numpy(x).type(dType).to(self.device)
 
 
     def forward(self, x):
