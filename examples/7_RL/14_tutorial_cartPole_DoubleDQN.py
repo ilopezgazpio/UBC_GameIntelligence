@@ -45,12 +45,12 @@ STEPS_TO_SOLVE = 195
 agent = DoubleDetDQN_RL_Agent(
     env=env,
     seed=seed,
-    gamma=0.9,
-    nn_learning_rate=0.01,
+    gamma=0.999,
+    nn_learning_rate=0.001,
     egreedy=0.99,
     egreedy_final=0.01,
-    egreedy_decay=5e4,
-    hidden_layers_size=[64],
+    egreedy_decay=5e2,
+    hidden_layers_size=[128,64],
     activation_fn=nn.Tanh,
     dropout=0.0,
     use_batch_norm=False,
@@ -58,8 +58,8 @@ agent = DoubleDetDQN_RL_Agent(
     optimizer=optim.Adam,
     memory_size=50000,
     batch_size=32,
-    target_net_update_steps=500,
-    clip_error=True
+    target_net_update_steps=250,
+    clip_error=False
 )
 
 for episode in range(num_episodes):
