@@ -56,10 +56,10 @@ agent = StableTargetNetDetDQN_RL_Agent(
     use_batch_norm=False,
     loss_fn=nn.MSELoss,
     optimizer=optim.Adam,
-     memory_size=50000,
-     batch_size=32,
-     target_net_update_steps=500,
-     clip_error=True
+    memory_size=50000,
+    batch_size=32,
+    target_net_update_steps=100,
+    clip_error=False
 )
 
 

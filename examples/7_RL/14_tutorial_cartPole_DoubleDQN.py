@@ -18,7 +18,7 @@ import sys
 plt.style.use('ggplot')
 
 # Hyperparameters
-num_episodes = 2000
+num_episodes = 500
 seed = 42
 
 # Create the environment
@@ -45,11 +45,11 @@ STEPS_TO_SOLVE = 195
 agent = DoubleDetDQN_RL_Agent(
     env=env,
     seed=seed,
-    gamma=0.9999,
-    nn_learning_rate=0.001,
-    egreedy=0.9,
+    gamma=0.9,
+    nn_learning_rate=0.01,
+    egreedy=0.99,
     egreedy_final=0.01,
-    egreedy_decay=400,
+    egreedy_decay=5e4,
     hidden_layers_size=[64],
     activation_fn=nn.Tanh,
     dropout=0.0,

@@ -1,4 +1,3 @@
-from SimpleBaselines.agent.AbstractRLAgent import AbstractRLAgent
 from SimpleBaselines.states.State import State
 from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
 from SimpleBaselines.memory.NaiveExperienceReplay import NaiveExperienceReplay
@@ -7,9 +6,7 @@ import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import math
-import random
-import sys
+
 
 class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
 
@@ -21,7 +18,7 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
                  egreedy=0.9,
                  egreedy_final=0.02,
                  egreedy_decay=500,
-                 hidden_layers_size=[(32, 3, 1),(64,3, 1)],
+                 hidden_layers_size=[64],
                  activation_fn=nn.Tanh,
                  dropout=0.0,
                  use_batch_norm=False,
