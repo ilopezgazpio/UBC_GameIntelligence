@@ -34,16 +34,16 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
         super().__init__(env=env,
                          seed=seed,
                          gamma=gamma,
-                         nn_learning_rate=0.01,
-                         egreedy=0.9,
-                         egreedy_final=0.02,
-                         egreedy_decay=500,
-                         hidden_layers_size=[64],
-                         activation_fn=nn.Tanh,
-                         dropout=0.0,
-                         use_batch_norm=False,
-                         loss_fn=nn.MSELoss,
-                         optimizer=optim.Adam
+                         nn_learning_rate=nn_learning_rate,
+                         egreedy=egreedy,
+                         egreedy_final=egreedy_final,
+                         egreedy_decay=egreedy_decay,
+                         hidden_layers_size=hidden_layers_size,
+                         activation_fn=activation_fn,
+                         dropout=dropout,
+                         use_batch_norm=use_batch_norm,
+                         loss_fn=loss_fn,
+                         optimizer=optimizer
                          )
 
 
