@@ -14,6 +14,9 @@ import random
 import math
 import time
 import sys
+import os
+import glob
+import cv2
 
 
 # Plot styling
@@ -31,7 +34,8 @@ env = gym.make(
     gravity=-10.0,
     enable_wind=False,
     wind_power=15.0,
-    turbulence_power=1.5
+    turbulence_power=1.5,
+    render_mode="rgb_array"
 )
 
 # Analyze the environment
@@ -110,7 +114,38 @@ for episode in range(num_episodes):
             print("Frames Total: {}".format(agent.current_state.step))
             print(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(elapsed_time))}")
 
+def show_all_videos(video_folder: str) -> str:
+    """Show all the videos recorded with opencv."""
+    video_files = glob.glob(os.path.join(video_folder, "*.mp4"))
+    for video_file in video_files:
+        video = cv2.VideoCapture(video_file)
+        while video.isOpened():
+            ret, frame = video.read()
+            if not ret:
+                break
+            cv2.imshow('Video', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        video.release()
+        cv2.destroyAllWindows()
+    return video_folder
 
+video_folder="videos"
+envVideo = gym.wrappers.RecordVideo(env, video_folder=video_folder)
+done = False #It is used to control if the episode is finished, if it is finished the environment must be reset
+state, info = envVideo.reset()
+
+total_reward = 0
+while not(done):
+    action = agent.__DQN_decision_function__(agent.current_state)
+    next_state, reward, done, truncated, info = envVideo.step(action)
+    state = next_state
+    total_reward +=reward
+    if done or truncated:
+        break
+envVideo.close()
+print("rew: ", total_reward)
+show_all_videos(video_folder=video_folder)
 # Close the environment
 env.close()
 
