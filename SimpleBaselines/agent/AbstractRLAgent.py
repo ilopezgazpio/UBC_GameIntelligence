@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 
 import sys
-import gym
 import torch
-import gymnasium
+import gymnasium as gym
 from gymnasium import spaces
 from SimpleBaselines.states.State import State
 from SimpleBaselines.reporting.RLReport import RLReport

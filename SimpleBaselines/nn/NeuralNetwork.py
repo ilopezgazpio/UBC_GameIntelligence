@@ -76,16 +76,21 @@ class NeuralNetwork(nn.Module):
 
 
     def toDevice(self, x : np.array, dType=torch.float32):
-        return torch.tensor(x, dtype=dType).to(self.device)
+        # return torch.tensor(x, dtype=dType).to(self.device)
+        x = np.array(x)
+        return torch.from_numpy(x).type(dType).to(self.device)
 
 
     def forward(self, x):
         return self.network(x)
 
 
-    def update_NN(self, predicted_value, target_value):
+    def update_NN(self, predicted_value, target_value, clip_error=False):
         'Update the weights of the NN'
         loss = self.loss_fn(predicted_value, target_value)
         self.optimizer.zero_grad()
         loss.backward()
+        if clip_error:
+            for param in self.network.parameters():
+                param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
