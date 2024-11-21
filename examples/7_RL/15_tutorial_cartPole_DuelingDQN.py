@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import gymnasium as gym
-from SimpleBaselines.agent.rl_agents.DoubleDetDQN_RL_Agent import DoubleDetDQN_RL_Agent
+from SimpleBaselines.agent.rl_agents.DuelingDetDQN_RL_Agent import DuelingDetDQN_RL_Agent
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
@@ -42,7 +42,7 @@ report_interval = 10
 STEPS_TO_SOLVE = 195
 
 # Create the agent
-agent = DoubleDetDQN_RL_Agent(
+agent = DuelingDetDQN_RL_Agent(
     env=env,
     seed=seed,
     gamma=0.999,
