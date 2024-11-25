@@ -112,7 +112,7 @@ class StableTargetNetDetDQN_RL_Agent(ExperienceReplayDetDQN_RL_Agent):
         self.QNetwork.update_NN(predicted_value, target_value, self.clip_error)
 
         if self.update_target_counter % self.target_net_update_steps == 0:
-            self.stable_target_net.network.load_state_dict(self.QNetwork.network.state_dict())
+            self.stable_target_net.network.load_state_dict(self.QNetwork.base_network.state_dict())
 
         self.update_target_counter += 1
 
