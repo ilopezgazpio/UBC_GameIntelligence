@@ -5,6 +5,7 @@
 
 import gymnasium as gym
 from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
+from SimpleBaselines.states.State import State
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
@@ -23,8 +24,7 @@ plt.style.use('ggplot')
 num_episodes = 500
 seed = 42
 
-# Create the environment
-# Create the environment
+# Create the training environment
 env = gym.make(
     "LunarLander-v3",
     continuous=False,
@@ -32,6 +32,17 @@ env = gym.make(
     enable_wind=False,
     wind_power=15.0,
     turbulence_power=1.5
+)
+
+# Create the testing environment
+env_test = gym.make(
+    "LunarLander-v3",
+    continuous=False,
+    gravity=-10.0,
+    enable_wind=False,
+    wind_power=15.0,
+    turbulence_power=1.5,
+    render_mode='human'
 )
 
 # Analyze the environment
@@ -48,7 +59,7 @@ solved_after = 0
 start_time = time.time()
 
 # Reporting parameters
-report_interval = 10
+report_interval = 40
 STEPS_TO_SOLVE = 195
 
 # Create the agent
@@ -57,9 +68,9 @@ agent = DeterministicDQN_RL_Agent(
     seed=seed,
     gamma=0.99,
     nn_learning_rate=0.01,
-    egreedy=0.9,
-    egreedy_final=0.02,
-    egreedy_decay=500,
+    egreedy=0.95,
+    egreedy_final=0.001,
+    egreedy_decay=1e3,
     hidden_layers_size=[64],
     activation_fn=nn.Tanh,
     dropout=0.0,
@@ -110,9 +121,13 @@ for episode in range(num_episodes):
             print("Frames Total: {}".format(agent.current_state.step))
             print(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(elapsed_time))}")
 
-
-# Close the environment
-env.close()
+            # Play test on env_test
+            observation, info = env_test.reset(seed=seed)
+            state = State(observation=observation, info=info)
+            while not (state.terminated or state.truncated):
+                action = agent.__action_decision_function__(state)
+                observation, reward, terminated, truncated, info = env_test.step(action)
+                state = State(observation=observation, terminated=terminated, truncated=truncated, info=info)
 
 # Print the results
 if solved_after > 0:
@@ -130,6 +145,9 @@ print("Percent of episodes finished successfully: {}".format( sum(rewards_total 
 print("Percent of episodes finished successfully (last 100 episodes): {}".format( sum(rewards_total[-100:] > STEPS_TO_SOLVE) / 100) )
 print("Average number of steps: {}".format( sum(steps_total)/num_episodes) )
 print("Average number of steps (last 100 episodes): {}".format( sum(steps_total[-100:])/100) )
+
+env.close()
+env_test.close()
 
 plt.figure(figsize=(12,5))
 plt.title("Cumulative Rewards")
