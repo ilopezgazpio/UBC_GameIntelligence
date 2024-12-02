@@ -1,0 +1,18 @@
+{
+    "dueling_dqn": {
+        "gamma": 0.9926421794846044,
+        "nn_learning_rate": 0.0010690242089271015,
+        "egreedy": 0.8181545758905434,
+        "egreedy_final": 0.013279998849952531,
+        "egreedy_decay": 3910,
+        "hidden_layers_size": [
+            128,
+            128,
+            128
+        ],
+        "dropout": 0.026179411970840075,
+        "memory_size": 9268,
+        "batch_size": 128,
+        "target_net_update_steps": 980
+    }
+}
