@@ -14,6 +14,7 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
                  env:gym.Env,
                  seed=None,
                  gamma=0.99,
+                 n_step=1,
                  nn_learning_rate=0.01,
                  egreedy=0.9,
                  egreedy_final=0.02,
@@ -47,6 +48,8 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
         ''' Parameters for the Experience Replay DQN agent '''
         self.memory_size = memory_size
         self.batch_size = batch_size
+        self.n_step = n_step
+        self.n_step_buffer = []
 
         # Create memory buffer
         self.memory = NaiveExperienceReplay(memory_size=self.memory_size, batch_size=self.batch_size)
@@ -64,8 +67,27 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
 
     def __ER_DQN_bellman_update__(self, old_state: State, action, new_observation : gym.Space, reward: float, terminated, truncated):
 
+        # Store n-step transitions
+        if len(self.n_step_buffer) < self.n_step:
+            self.n_step_buffer.append((old_state, action, new_observation, reward, terminated, truncated))
+            return
+        else:
+            new_satate = old_state, action, new_observation, reward, terminated, truncated
+            # Add n-step reward and new_state to the oldest transition and add it to the memory
+            old_state, action, _, reward, terminated, truncated = self.n_step_buffer.pop(0)
+            # Update reward with n-step reward
+            reward += sum([self.gamma ** i * r for i, (_, _, _, r, _, _) in enumerate(self.n_step_buffer, 1)])
+            self.n_step_buffer.append(new_satate)
+
         # Store experience in memory
-        self.memory.push(old_state.observation, action, new_observation, reward, terminated, truncated)
+        if terminated or truncated:
+            for j, transition in enumerate(self.n_step_buffer):
+                old_state, action, _, reward, terminated, truncated = transition
+                reward += sum([self.gamma ** i-j * r for i, (_, _, _, r, _, _) in enumerate(self.n_step_buffer, j+1)])
+                self.memory.push(old_state.observation, action, new_observation, reward, terminated, truncated)
+            self.n_step_buffer.clear()
+        
+        else: self.memory.push(old_state.observation, action, new_observation, reward, terminated, truncated)
         if len(self.memory) < self.batch_size:
             # not enough samples in memory
             return
@@ -88,7 +110,7 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
             q_values = self.QNetwork(new_observation_batch)
 
         # Automatic broadcasting is used below
-        target_value = reward_batch + (1 - (terminated_batch | truncated_batch)) * self.gamma * torch.max(q_values, 1)[0]
+        target_value = reward_batch + (1 - (terminated_batch | truncated_batch)) * self.gamma**self.n_step * torch.max(q_values, 1)[0]
 
         predicted_value = self.QNetwork(old_observation_batch).gather(1, action_batch.unsqueeze(1)).squeeze(1)
 

@@ -64,7 +64,6 @@ env_test = gym.make(
     enable_wind=False,
     wind_power=15.0,
     turbulence_power=1.5,
-    render_mode='human'
 )
 
 # Analyze the environment

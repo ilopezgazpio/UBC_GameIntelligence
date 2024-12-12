@@ -44,8 +44,7 @@ env_test = gym.make(
     gravity=-10.0,
     enable_wind=False,
     wind_power=15.0,
-    turbulence_power=1.5,
-    render_mode='human'
+    turbulence_power=1.5
 )
 
 # Analyze the environment
@@ -71,6 +70,7 @@ agent = DoubleDetDQN_RL_Agent(
     seed=None,
     gamma=0.99,
     nn_learning_rate=0.00063,
+    n_step=4,
     egreedy=0.99,
     egreedy_final=0.1,
     egreedy_decay=0.12,
