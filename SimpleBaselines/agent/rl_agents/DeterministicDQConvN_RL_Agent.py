@@ -43,17 +43,18 @@ class DeterministicDQConvN_RL_Agent(DeterministicDQN_RL_Agent):
                          optimizer=optim.Adam
                          )
 
+        self.QNetwork = self.__init_NN__(seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate)
 
-        self.QNetwork = ConvolutionalNetwork(
-            self.env.observation_space.shape,
-            self.env.action_space.n,
-            hidden_layers_size,
-            activation_fn,
-            nn_learning_rate,
-            dropout,
-            use_batch_norm,
-            loss_fn,
-            optimizer,
-            seed
-        )
-
+        def __init_NN__(self, seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate):
+            return ConvolutionalNetwork(
+                self.env.observation_space.shape,
+                self.env.action_space.n,
+                hidden_layers_size,
+                activation_fn,
+                nn_learning_rate,
+                dropout,
+                use_batch_norm,
+                loss_fn,
+                optimizer,
+                seed
+            )

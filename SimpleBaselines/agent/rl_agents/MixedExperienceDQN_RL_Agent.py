@@ -1,20 +1,18 @@
-from SimpleBaselines.states.State import State
-from SimpleBaselines.agent.rl_agents.DoubleDetDQN_RL_Agent import DoubleDetDQN_RL_Agent
-from SimpleBaselines.nn.DuelingNeuralNetwork import DuelingNeuralNetwork
-import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import gymnasium as gym
+from SimpleBaselines.memory.MixedExperienceReplay import MixedExperienceReplay
+from SimpleBaselines.agent.rl_agents.DoubleDetDQN_RL_Agent import DoubleDetDQN_RL_Agent
 
-
-class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
+class MixedExperienceDQN_RL_Agent(DoubleDetDQN_RL_Agent):
 
     def __init__(self,
                  env:gym.Env,
                  seed=None,
                  gamma=0.99,
-                 nn_learning_rate=0.01,
                  n_step=1,
+                 nn_learning_rate=0.01,
                  egreedy=0.9,
                  egreedy_final=0.02,
                  egreedy_decay=500,
@@ -25,9 +23,13 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                  loss_fn=nn.MSELoss,
                  optimizer=optim.Adam,
                  memory_size=50000,
+                 data_size=10000,
                  batch_size=32,
                  target_net_update_steps=500,
-                 clip_error=True
+                 clip_error=True,
+                 data_amount_start = 1.0,
+                 data_amount_end = 0.0,
+                 data_amount_decay = 0.99
                  ):
 
         super().__init__(env=env,
@@ -50,30 +52,19 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                          clip_error=clip_error
                          )
 
-        ''' Parameters for the Dueling DQN agent '''
+        ''' Parameters for the Mixed Experience DQN agent '''
+        self.memory = MixedExperienceReplay(memory_size, data_size, batch_size, data_amount_start, data_amount_end, data_amount_decay)
+        
         # Set action decision function
-        # Dueling DQN agent plays as a standard Double DQN with experience replay with the following modification:
-        # The neural networking architecture is modified to have two separate streams for state value and advantage value
+        # Mixed Experience DQN agent plays as a standard Dueling DQN with experience replay with the following modification:
+        # The memory buffer is a mix of experience replay and a set of expert demonstrations, with a specified ratio of data from each
 
         # internal estimator NN updates following the deterministic scenario Bellman equation under specified loss function
-        # BUT training is more stable since parameters of training net are not always exposed at the time of optimizing
 
-        # action decision function is inherited from superclass
-        # self.__action_decision_function__ = self.__DQN_decision_function__
+    def populate_data(self, data):
+        """
+        Populate the memory with data
+        data: list of tuples (state, action, next_state, reward, terminated, truncated)
+        """
+        self.memory.populate_data(data)
 
-        # update function is inherited from superclass
-        # self.__update_function__ = self.__Double_DQN_bellman_update__
-
-        def __init_NN__(self, seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate):
-            return DuelingNeuralNetwork(
-                self.env.observation_space.shape[0],
-                self.env.action_space.n,
-                hidden_layers_size,
-                activation_fn,
-                nn_learning_rate,
-                dropout,
-                use_batch_norm,
-                loss_fn,
-                optimizer,
-                seed
-            )

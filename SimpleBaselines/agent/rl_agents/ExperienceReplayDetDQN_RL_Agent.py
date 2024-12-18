@@ -72,12 +72,12 @@ class ExperienceReplayDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
             self.n_step_buffer.append((old_state, action, new_observation, reward, terminated, truncated))
             return
         else:
-            new_satate = old_state, action, new_observation, reward, terminated, truncated
+            exp = old_state, action, new_observation, reward, terminated, truncated
             # Add n-step reward and new_state to the oldest transition and add it to the memory
             old_state, action, _, reward, terminated, truncated = self.n_step_buffer.pop(0)
             # Update reward with n-step reward
             reward += sum([self.gamma ** i * r for i, (_, _, _, r, _, _) in enumerate(self.n_step_buffer, 1)])
-            self.n_step_buffer.append(new_satate)
+            self.n_step_buffer.append(exp)
 
         # Store experience in memory
         if terminated or truncated:

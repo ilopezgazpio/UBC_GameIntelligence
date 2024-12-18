@@ -43,20 +43,22 @@ class StochasticDQN_RL_Agent(AbstractRLAgent):
         self.egreedy_final = egreedy_final
         self.egreedy_decay = egreedy_decay
         self.Q_learning_rate = Q_learning_rate
+        self.QNetwork = self.__init_NN__(seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate)
 
 
-        self.QNetwork = NeuralNetwork(
-            self.env.observation_space.shape[0],
-            self.env.action_space.n,
-            hidden_layers_size,
-            activation_fn,
-            nn_learning_rate,
-            dropout,
-            use_batch_norm,
-            loss_fn,
-            optimizer,
-            seed
-        )
+    def __init_NN__(self, seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate): 
+        return NeuralNetwork(
+                self.env.observation_space.shape[0],
+                self.env.action_space.n,
+                hidden_layers_size,
+                activation_fn,
+                nn_learning_rate,
+                dropout,
+                use_batch_norm,
+                loss_fn,
+                optimizer,
+                seed
+            )
 
 
     def update_egreedy(self):

@@ -56,18 +56,7 @@ class StableTargetNetDetDQN_RL_Agent(ExperienceReplayDetDQN_RL_Agent):
         self.clip_error = clip_error
 
         # Create the stable network (must be a clone of the QNetwork)
-        self.stable_target_net = NeuralNetwork(
-            self.env.observation_space.shape[0],
-            self.env.action_space.n,
-            hidden_layers_size,
-            activation_fn,
-            nn_learning_rate,
-            dropout,
-            use_batch_norm,
-            loss_fn,
-            optimizer,
-            seed
-        )
+        self.stable_target_net = self.__init_NN__(seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate)
 
         # Set action decision function
         # Stable Target Network DQN agent plays as a standard Deterministic DQN with experience replay

@@ -41,9 +41,14 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
         self.egreedy = egreedy
         self.egreedy_final = egreedy_final
         self.egreedy_decay = egreedy_decay
+        # Set internal NN
+        self.QNetwork = self.__init_NN__(seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate)
 
 
-        self.QNetwork = NeuralNetwork(
+
+
+    def __init_NN__(self, seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate):
+        return NeuralNetwork(
             self.env.observation_space.shape[0],
             self.env.action_space.n,
             hidden_layers_size,
