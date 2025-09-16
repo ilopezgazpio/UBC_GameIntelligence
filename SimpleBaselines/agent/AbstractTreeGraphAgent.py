@@ -110,9 +110,10 @@ class AbstractTreeGraphAgent(ABC):
 
         # We need this hack to work with Wrapped environments. Do not pay close attention
         if self.wrapped_env:
-            __is_applicable__ = node.env.env.env.is_applicable
+            node.env = node.env.unwrapped
+            __is_applicable__ = node.env.is_applicable
         else:
-            __is_applicable__ = node.env.env.is_applicable
+            __is_applicable__ = node.env.is_applicable
 
         if isinstance(action_space, spaces.Discrete):
             for action in range(action_space.n):

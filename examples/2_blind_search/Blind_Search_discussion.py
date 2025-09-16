@@ -34,6 +34,8 @@ import matplotlib.pyplot as plt
 
 # Environment set up
 env = gym.make('gym_RiverCrossing:RiverCrossing-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 first_node = Node(env, first_observation)
 
@@ -131,13 +133,15 @@ plt.show()
 
 # Let's define the environment
 env = gym.make('gym_8Puzzle:8Puzzle-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 
 # ... but hack the environment to set an easy setup, instead of random
 first_observation = np.array((1,2,5,3,4,8,0,6,7)).reshape(3,3)
 # 6 steps needed to be solved (R,R,U,U,L,L)
 
-env.env.state = first_observation
+env.state = first_observation
 first_node = Node(env, first_observation)
 
 # Check everything OK
@@ -266,7 +270,7 @@ first_observation = altered_env.reset()
 first_observation = np.array((1,2,5,3,4,8,0,6,7)).reshape(3,3)
 
 # 6 steps needed to be solved (R,R,U,U,L,L)
-altered_env.env.env.state = first_observation
+altered_env.env.state = first_observation
 first_node = Node(altered_env, first_observation)
 
 # Check everything OK

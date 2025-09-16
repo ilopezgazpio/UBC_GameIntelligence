@@ -26,6 +26,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 env = gym.make('gym_RiverCrossing:RiverCrossing-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 first_node = Node(env, first_observation)
 env.render()
@@ -119,6 +121,8 @@ plt.show()
 # 8-Puzzle environment
 #---------------------
 env = gym.make('gym_8Puzzle:8Puzzle-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 first_node = Node(env, first_observation)
 

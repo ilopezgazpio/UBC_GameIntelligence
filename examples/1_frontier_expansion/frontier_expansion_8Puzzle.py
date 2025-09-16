@@ -41,6 +41,7 @@ import gymnasium as gym
 
 # environments are constructed using the gym.make call
 env = gym.make('gym_8Puzzle:8Puzzle-v0')
+env = env.unwrapped
 
 # environments define the observation spaces for agents. These are defined as Openai gym spaces
 env.observation_space
@@ -68,7 +69,7 @@ first_observation
 env.render()
 
 # or analyze the state itself in greater detail as a numpy array
-env.env.state
+env.state
 
 # As mentioned, the very first observation is defined by a 3x3 dimensional numpy array denoting the state of the board
 
@@ -77,12 +78,12 @@ env.env.state
 # 1. which method is used to check if an observation is terminal ?
 # 2. how is the method implemented ?
 
-env.env.episode_terminated()
+env.episode_terminated()
 
 # we can also hack the environment as we understand all of the details :)
 import numpy as np
-env.env.state = np.array(np.arange(0,9).reshape(3,3))
-env.env.episode_terminated()
+env.state = np.array(np.arange(0,9).reshape(3,3))
+env.episode_terminated()
 
 # Can you imagine other ways to implement the __episode_terminated__ method ?
 
@@ -102,13 +103,13 @@ env.env.episode_terminated()
 # here, we define various auxiliar methods __is_applicable__(action) and __do_step__(action) to facilitate the usage of the environment
 
 # So, we can check if moving left is allowed...
-env.env.is_applicable(2)
+env.is_applicable(2)
 
 # Or moving right
-env.env.is_applicable(3)
+env.is_applicable(3)
 
 # or moving down
-env.env.is_applicable(1)
+env.is_applicable(1)
 
 # And the effect of applying an action over a state is inverting the corresponding values of the tiles:
 env.step(3)
@@ -134,7 +135,7 @@ first_node = Node(env)
 # We have our initial node to start the search process
 # We can also call openai gym commands through the node env variable, as the environment is saved there :)
 first_node.env.render()
-first_node.env.env.state
+first_node.env.state
 
 
 # Define a frontier with nodes pending of "expansion"
@@ -155,10 +156,10 @@ first_level_expansion_nodes = searchAgent.__expand_node__(current_node)
 
 # analyze the function expand_node, can you explain why a deepcopy of the environment is necessary ?
 len(first_level_expansion_nodes)
-first_level_expansion_nodes[0].env.env.render()
+first_level_expansion_nodes[0].env.render()
 first_level_expansion_nodes[0].action_history
 
-first_level_expansion_nodes[1].env.env.render()
+first_level_expansion_nodes[1].env.render()
 first_level_expansion_nodes[1].action_history
 
 frontier.nodes.extend(first_level_expansion_nodes)
@@ -172,10 +173,10 @@ current_node.terminated or current_node.truncated
 
 second_level_expansion_nodes = searchAgent.__expand_node__(current_node)
 len(second_level_expansion_nodes)
-first_level_expansion_nodes[0].env.env.render()
+first_level_expansion_nodes[0].env.render()
 frontier.nodes.extend(second_level_expansion_nodes)
-frontier.nodes[0].env.env.render()
-frontier.nodes[1].env.env.render()
+frontier.nodes[0].env.render()
+frontier.nodes[1].env.render()
 
 
 # Can you perform some extra steps ?

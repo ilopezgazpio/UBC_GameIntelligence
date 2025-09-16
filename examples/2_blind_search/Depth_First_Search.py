@@ -26,6 +26,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 env = gym.make('gym_RiverCrossing:RiverCrossing-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 first_node = Node(env, first_observation)
 env.render()
@@ -35,17 +37,17 @@ blind_dfs_tree_agent = Blind_DFS_Tree_Agent()
 blind_dfs_tree_agent.blind_search(first_node)
 
 # If solution is found we can explore the solution :)
-blind_dfs_tree_agent.final_node.depth
-blind_dfs_tree_agent.final_node.action_history
-blind_dfs_tree_agent.final_node.observation
-blind_dfs_tree_agent.final_node.env.render()
+#blind_dfs_tree_agent.final_node.depth
+#blind_dfs_tree_agent.final_node.action_history
+#blind_dfs_tree_agent.final_node.observation
+#blind_dfs_tree_agent.final_node.env.render()
 # etc
 
 # we can also analyze the search process using the reporting class inside the agent
-blind_dfs_tree_agent.reporting.log
-blind_dfs_tree_agent.reporting.plotNumberNodesFrontier()
-blind_dfs_tree_agent.reporting.plotFrontierMaxDepth()
-blind_dfs_tree_agent.reporting.plotNodesAddedFrontier(nbins=10)
+#blind_dfs_tree_agent.reporting.log
+#blind_dfs_tree_agent.reporting.plotNumberNodesFrontier()
+#blind_dfs_tree_agent.reporting.plotFrontierMaxDepth()
+#blind_dfs_tree_agent.reporting.plotNodesAddedFrontier(nbins=10)
 
 # Task
 # What is happening in this experiment ?
@@ -119,6 +121,8 @@ plt.show()
 # 8-Puzzle environment
 #---------------------
 env = gym.make('gym_8Puzzle:8Puzzle-v0')
+env = env.unwrapped
+
 first_observation = env.reset()
 first_node = Node(env, first_observation)
 
