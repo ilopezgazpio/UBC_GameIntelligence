@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "SimpleBaselines"
+version = "0.0.1"                      # Or use dynamic versioning (see below)
+description = "Tree, Graph, Local and RL baselines for research and academia"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Inigo Lopez Gazpio", email = "inigo.lopez@ehu.eus" }]
+keywords = ["Search Heuristics", "Tree-Graph Search", "Local Search", "rl"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License"
+]
+
+# Runtime dependencies
+dependencies = [
+  "numpy>=1.24",
+  "scipy",
+  "pandas",
+  "matplotlib",
+  "gymnasium"
+]
+
+# Tell the builder where your code lives
+[tool.hatch.build.targets.wheel]
+packages = ["./SimpleBaselines"]
