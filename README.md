@@ -95,6 +95,24 @@ cd <your-repo-name>
 PYTHONPATH=. python examples/2_blind_search/Breadth_First_Search.py
 
 ```
+
+or you can also install SimpleBaselines library with (from inside ./SimpleBaselines folder)
+```
+pip install -e .
+```
+
+or with (from the root of the git repo)
+
+```
+pip install -e SimpleBaselines
+```
+
+or with (from colab or other online editors)
+```
+pip install git+https://github.com/ilopezgazpio/UBC_GameIntelligence.git
+```
+
+
 4. Explore the tutorials in examples/ (see the full list below).
 
 
@@ -182,6 +200,21 @@ examples/
     └── optuna_lunarlander.py
 
 
+### Commands for debug
+
+```
+# one-time
+python -m pip install --upgrade build
+
+# build sdist + wheel into dist/
+python -m build
+
+# install the wheel (what users do)
+python -m pip install dist/mylib-0.1.0-py3-none-any.whl
+
+# OR dev/editable install for local hacking
+python -m pip install -e .
+```
 
 
 
