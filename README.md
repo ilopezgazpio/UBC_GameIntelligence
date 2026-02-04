@@ -16,6 +16,9 @@ Install these core libraries inside a virtual environment (see next section):
 - `scipy`
 - `matplotlib`
 - `pandas`
+- `opencv`
+
+- Some algorithms may also need stable-baselines and/or pytorch libraries
 
 ---
 
@@ -42,7 +45,7 @@ source .venv/bin/activate.fish
 
 # 4) Upgrade pip and install required packages
 pip install --upgrade pip
-pip install gymnasium numpy scipy matplotlib pandas
+pip install gymnasium swig gymnasium[box2d] numpy scipy matplotlib pandas opencv-python
 
 # 5) Deactivate when done
 deactivate
@@ -71,7 +74,7 @@ source .venv/Scripts/activate
 
 # 4) Upgrade pip and install required packages
 pip install --upgrade pip
-pip install gymnasium numpy scipy matplotlib pandas
+pip install gymnasium swig gymnasium[box2d] numpy scipy matplotlib pandas opencv-python
 
 # 5) Deactivate
 deactivate
