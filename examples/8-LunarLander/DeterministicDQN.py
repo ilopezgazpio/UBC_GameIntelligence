@@ -1,3 +1,7 @@
+# Usage: Launch from the root directory of the repository
+# $ PYTHONPATH=. PYTHONPATH=. python examples/8-LunarLander/DeterministicDQN.py
+
+
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import torch
@@ -74,6 +78,11 @@ agent = DeterministicDQN_RL_Agent(
 )
 
 
+
+"""
+buble de training
+"""
+
 for episode in range(num_episodes):
 
   agent.reset_env(seed = seed)
@@ -100,9 +109,8 @@ for episode in range(num_episodes):
       elapsed_time = time.time() - start_time
       print('----------------')
       print('Episode: {}'.format(episode))
-      print('Average Reward [last {}]: {:.2f}'.format(report_interval,
-                                                     np.mean(rewards_total[-report_interval:]))) # average reward de los ultimos episodes
-      print('Average Reward [last 100]: {:.2f}'.format(np.mean(rewards_total[-100:]))) # average reward de los ultimos 100
+      print('Average Reward [last {}]: {:.2f}'.format(report_interval, np.mean(rewards_total[-report_interval:])))
+      print('Average Reward [last 100]: {:.2f}'.format(np.mean(rewards_total[-100:])))
       print('Average Reward: {:.2f}'.format(np.mean(rewards_total)))
 
       # mismo reporte que las recompensas pero con pasos
@@ -135,3 +143,24 @@ print("Percent of episodes finished successfully: {}%".format(sum(rewards_total 
 print("Percent of episodes finished successfully (last 100 episodes): {}%".format(sum(rewards_total[-100:] > MIN_MEAN_REWARDS)))
 print("Average number of steps: {}".format(np.mean(steps_total)))
 print("Average number of steps (last 100 episodes): {}".format(np.mean(steps_total[-100:])) )
+
+"""
+Plotting utilities
+
+run command with -i option to keep execution environment
+
+plt.figure(figsize=(12,5))
+plt.title("Cumulative Rewards")
+plt.bar(torch.arange(len(rewards_total)), rewards_total, alpha=0.6, color='green', width=5)
+plt.show()
+
+plt.figure(figsize=(12,5))
+plt.title("Steps / Episode length")
+plt.bar(torch.arange(len(steps_total)), steps_total, alpha=0.6, color='red', width=5)
+plt.show()
+
+plt.figure(figsize=(12,5))
+plt.title("Egreedy / Episode length")
+plt.bar(torch.arange(len(egreedy_total)), egreedy_total, alpha=0.6, color='red', width=5)
+plt.show()
+""" 
