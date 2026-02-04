@@ -1,7 +1,5 @@
-import gymnasium as gym
-from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
-from SimpleBaselines.states.State import State
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,13 +12,20 @@ import os
 import glob
 import cv2
 
-# Crear enviroment de entrenamiento
+
+"""
+Crear enviroment de entrenamiento
+"""
+
+import gymnasium as gym
+
 env = gym.make("LunarLander-v3",
                continuous = False,
                gravity = -10.0,
                enable_wind = False,
                wind_power = 0.0,
                turbulence_power = 0.0)
+
 
 # Analizar el environment
 print('Observation space: ', env.observation_space)
@@ -29,7 +34,14 @@ print('Action space: ', env.action_space) # 0: nada, 1: principal, 2: izquierdo,
 print('Action space sample: ', env.action_space.sample())
 
 
-plt.style.use('ggplot')
+
+
+"""
+Crear el agente RL
+"""
+
+from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
+from SimpleBaselines.states.State import State
 
 num_episodes = 500
 max_steps = 10000
@@ -39,10 +51,10 @@ rewards_total = list()
 steps_total = list()
 egreedy_total = list()
 solved_after = 0 # para saber en qué episodio se ha resuelto (o no, 0)
-start_time = time.time()
-
-report_interval = 40 # reporte cada 40 episodios
 MIN_MEAN_REWARDS = 200 # condición de resuelto
+start_time = time.time()
+report_interval = 50
+
 
 
 agent = DeterministicDQN_RL_Agent(
@@ -52,7 +64,7 @@ agent = DeterministicDQN_RL_Agent(
     nn_learning_rate = 0.01, # tasa alta de aprendizaje
     egreedy = 0.95, # empieza explorando mucho, 95% de acciones aleatorias
     egreedy_final = 0.001, # acaba casi explotando completamente, acciones óptimas conocidas
-    egreedy_decay = 1e3, # desciende lentamente para explorar y terminar explotando
+    egreedy_decay = 35e3, # desciende lentamente para explorar y terminar explotando
     hidden_layers_size = [64],
     activation_fn = nn.Tanh,
     dropout = 0.0,
@@ -77,19 +89,19 @@ for episode in range(num_episodes):
     mean_reward_100 = sum(rewards_total[-100:]) / min(len(rewards_total), 100) # media de las últimas 100 recompensas
 
     # Condición de resuelto
-    if mean_reward_100 > MIN_MEAN_REWARDS and solved_after ==0:
+    if mean_reward_100 > MIN_MEAN_REWARDS and solved_after == 0:
       print('************************')
       print('SOLVED! After {} episodes'.format(episode))
       print('************************')
       solved_after = episode + 1 # porque empieza en episode = 0
 
-    # Hacer reporte cada 40 episodios
+    # Hacer reporte cada 50 episodios
     if episode % report_interval == 0 and episode != 0:
       elapsed_time = time.time() - start_time
       print('----------------')
-      print('Episode: {}'.format(episode)) # episodio numero 40, 80, 120...
+      print('Episode: {}'.format(episode))
       print('Average Reward [last {}]: {:.2f}'.format(report_interval,
-                                                     np.mean(rewards_total[-report_interval:]))) # average reward de los ultimos 40
+                                                     np.mean(rewards_total[-report_interval:]))) # average reward de los ultimos episodes
       print('Average Reward [last 100]: {:.2f}'.format(np.mean(rewards_total[-100:]))) # average reward de los ultimos 100
       print('Average Reward: {:.2f}'.format(np.mean(rewards_total)))
 
