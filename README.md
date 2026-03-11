@@ -15,6 +15,7 @@ Install these core libraries inside a virtual environment (see next section):
 - `numpy`
 - `scipy`
 - `matplotlib`
+- `torch`
 - `pandas`
 - `opencv`
 - `optuna`
@@ -48,6 +49,8 @@ source .venv/bin/activate.fish
 # 4) Upgrade pip and install required packages
 pip install --upgrade pip
 pip install gymnasium swig gymnasium[box2d] numpy scipy matplotlib pandas opencv-python optuna optuna-dashboard
+
+[verify torch instalation](https://pytorch.org/get-started/locally/)
 
 # 5) Deactivate when done
 deactivate
