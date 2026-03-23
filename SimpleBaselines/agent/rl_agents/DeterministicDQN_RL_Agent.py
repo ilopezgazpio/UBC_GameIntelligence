@@ -65,7 +65,7 @@ class DeterministicDQN_RL_Agent(AbstractRLAgent):
     def update_egreedy(self):
         # Epsilon greedy weight decay
         self.total_steps += 1
-        if self.egreedy and self.egreedy_final and self.egreedy_decay and self.egreedy > self.egreedy_final:
+        if self.egreedy > self.egreedy_final:
             self.egreedy = self.egreedy_final + ( self.egreedy - self.egreedy_final ) * math.exp( -1. * self.total_steps / self.egreedy_decay )
 
 
