@@ -78,6 +78,8 @@ from optuna.samplers import TPESampler
 from optuna.trial import Trial
 from optuna.trial import TrialState
 
+from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
+from SimpleBaselines.agent.rl_agents.StochasticDQN_RL_Agent import StochasticDQN_RL_Agent
 from SimpleBaselines.agent.rl_agents.DuelingDetDQN_RL_Agent import DuelingDetDQN_RL_Agent
 from SimpleBaselines.states.State import State
 
@@ -208,7 +210,6 @@ class SummaryRow:
 TODO
 """
 
-
 """
 DUELING DETERMINISTIC DQN
 """
@@ -233,7 +234,7 @@ def decode_best_params(algorithm_name: str, best_params: dict) -> dict:
     return params
 
 
-def resolve_dueling_det_dqn_params(sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
+def resolve_params(sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
     params = dict(sampled_params)
 
     # Decode the storage-safe categorical value into the real architecture.
@@ -266,6 +267,53 @@ def dueling_det_dqn_search_space(trial: Trial) -> Dict[str, Any]:
         "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000),
     }
 
+"""
+DETERMINISTIC DQN
+"""
+def deterministic_dqn_search_space(trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for DeterministicDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5)
+    }
+
+
+"""
+STOCHASTIC DQN
+"""
+def stochastic_dqn_search_space(trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for StochasticDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.4, 1.0),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5)
+    }
+
+
 
 """
 General Algorithm Registry
@@ -279,13 +327,45 @@ ALGORITHM_REGISTRY: Dict[str, AlgorithmSpec] = {
             "DuelingDetDQN_RL_Agent"
         ),
         search_space=dueling_det_dqn_search_space,
-        resolve_params=resolve_dueling_det_dqn_params,
+        resolve_params=resolve_params,
         fixed_kwargs={
             "activation_fn": nn.Tanh,
             "use_batch_norm": False,
             "loss_fn": nn.MSELoss,
             "optimizer": optim.Adam,
             "clip_error": True,
+        },
+    ),
+
+    "deterministic_dqn": AlgorithmSpec(
+        name="deterministic_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent."
+            "DeterministicDQN_RL_Agent"
+        ),
+        search_space=deterministic_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
+        },
+    ),
+
+    "stochastic_dqn": AlgorithmSpec(
+        name="stochastic_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.StochasticDQN_RL_Agent."
+            "StochasticDQN_RL_Agent"
+        ),
+        search_space=stochastic_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
         },
     ),
 }
