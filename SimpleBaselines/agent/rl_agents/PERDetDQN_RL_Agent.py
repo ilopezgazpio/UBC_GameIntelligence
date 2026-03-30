@@ -1,3 +1,12 @@
+from SimpleBaselines.states.State import State
+from SimpleBaselines.agent.rl_agents.DeterministicDQN_RL_Agent import DeterministicDQN_RL_Agent
+from SimpleBaselines.memory.PrioritizedExperienceReplay import PrioritizedExperienceReplay
+
+import gymnasium as gym
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
 class PERDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
 
     def __init__(self,
