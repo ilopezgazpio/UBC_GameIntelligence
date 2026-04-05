@@ -1,5 +1,5 @@
 from SimpleBaselines.states.State import State
-from SimpleBaselines.agent.rl_agents.StableTargetNetDetDQN_RL_Agent import StableTargetNetDetDQN_RL_Agent
+from SimpleBaselines.agent.rl_agents.STNDetDQN_RL_Agent import STNDetDQN_RL_Agent
 
 import gymnasium as gym
 import torch
@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-class DoubleDetDQN_RL_Agent(StableTargetNetDetDQN_RL_Agent):
+class DoubleDetDQN_RL_Agent(STNDetDQN_RL_Agent):
 
     def __init__(self,
                  env:gym.Env,
@@ -105,7 +105,15 @@ class DoubleDetDQN_RL_Agent(StableTargetNetDetDQN_RL_Agent):
 
         predicted_value = self.QNetwork(old_observation_batch).gather(1, action_batch.unsqueeze(1)).squeeze(1)
 
-        self.QNetwork.update_NN(predicted_value, target_value, self.clip_error)
+        # Update PER memory
+        td_errors = torch.abs(target_value - predicted_value).detach().cpu().numpy()
+        self.memory.update_priorities(indices, td_errors)
+        loss = (weights * (predicted_value - target_value) ** 2).mean()
+
+        self.QNetwork.optimizer.zero_grad()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.QNetwork.parameters(), max_norm=10.0)
+        self.QNetwork.optimizer.step()
 
         if self.update_target_counter % self.target_net_update_steps == 0:
             self.stable_target_net.load_state_dict(self.QNetwork.state_dict())
