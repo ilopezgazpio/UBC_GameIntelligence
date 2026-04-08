@@ -26,6 +26,11 @@ class DoubleDetDQN_RL_Agent(STNDetDQN_RL_Agent):
                  optimizer=optim.Adam,
                  memory_size=50000,
                  batch_size=32,
+                 per_alpha=0.3,
+                 per_beta=0.4,
+                 per_beta_increment=0.0005,
+                 per_epsilon=0.01,
+                 per_variant='proportional',
                  target_net_update_steps=500,
                  clip_error=True
                  ):
@@ -46,6 +51,11 @@ class DoubleDetDQN_RL_Agent(STNDetDQN_RL_Agent):
                          optimizer=optimizer,
                          memory_size=memory_size,
                          batch_size=batch_size,
+                         per_alpha=per_alpha,
+                         per_beta=per_beta,
+                         per_beta_increment=per_beta_increment,
+                         per_epsilon=per_epsilon,
+                         per_variant=per_variant,
                          target_net_update_steps=target_net_update_steps,
                          clip_error=clip_error
                          )
