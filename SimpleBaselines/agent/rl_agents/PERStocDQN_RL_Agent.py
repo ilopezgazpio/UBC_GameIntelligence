@@ -14,6 +14,7 @@ class PERStocDQN_RL_Agent(StochasticDQN_RL_Agent):
                  seed=None,
                  gamma=0.99,
                  nn_learning_rate=0.01,
+                 Q_learning_rate=0.95,
                  egreedy=0.9,
                  egreedy_final=0.02,
                  egreedy_decay=500,
@@ -25,7 +26,6 @@ class PERStocDQN_RL_Agent(StochasticDQN_RL_Agent):
                  optimizer=optim.Adam,
                  memory_size=50000,
                  batch_size=32, 
-                 # hiperparámetros PER
                  per_alpha=0.3,
                  per_beta=0.4,
                  per_beta_increment=0.0005,
@@ -37,6 +37,7 @@ class PERStocDQN_RL_Agent(StochasticDQN_RL_Agent):
                          seed=seed,
                          gamma=gamma,
                          nn_learning_rate=nn_learning_rate,
+                         Q_learning_rate=Q_learning_rate,
                          egreedy=egreedy,
                          egreedy_final=egreedy_final,
                          egreedy_decay=egreedy_decay,
