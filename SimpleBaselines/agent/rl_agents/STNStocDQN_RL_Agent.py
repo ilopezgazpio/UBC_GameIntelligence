@@ -98,7 +98,7 @@ class STNStocDQN_RL_Agent(PERStocDQN_RL_Agent): # with PER memory
         reward_batch = self.QNetwork.toDevice(reward_batch)
         terminated_batch = self.QNetwork.toDevice(terminated_batch, dType=torch.uint8)
         truncated_batch = self.QNetwork.toDevice(truncated_batch, dType=torch.uint8)
-        weights = self.QNetwork.toDevice(weights, dtype=torch.float32)
+        weights = self.QNetwork.toDevice(weights, dType=torch.float32)
 
         # NN is used to predict Q table for a given state --> Q[state, actions]
         # detach is used to avoid gradients at this time, we want to train NN with state, not with next_observation
