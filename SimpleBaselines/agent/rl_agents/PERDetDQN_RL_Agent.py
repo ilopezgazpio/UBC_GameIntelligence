@@ -25,7 +25,6 @@ class PERDetDQN_RL_Agent(DeterministicDQN_RL_Agent):
                  optimizer=optim.Adam,
                  memory_size=50000,
                  batch_size=32, 
-                 # hiperparámetros PER
                  per_alpha=0.3,
                  per_beta=0.4,
                  per_beta_increment=0.0005,
