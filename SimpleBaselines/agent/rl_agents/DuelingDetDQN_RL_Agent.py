@@ -14,7 +14,6 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                  seed=None,
                  gamma=0.99,
                  nn_learning_rate=0.01,
-                 n_step=1,
                  egreedy=0.9,
                  egreedy_final=0.02,
                  egreedy_decay=500,
@@ -26,6 +25,11 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                  optimizer=optim.Adam,
                  memory_size=50000,
                  batch_size=32,
+                 per_alpha=0.3,
+                 per_beta=0.4,
+                 per_beta_increment=0.0005,
+                 per_epsilon=0.01,
+                 per_variant='proportional',
                  target_net_update_steps=500,
                  clip_error=True
                  ):
@@ -34,7 +38,6 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                          seed=seed,
                          gamma=gamma,
                          nn_learning_rate=nn_learning_rate,
-                         n_step=n_step,
                          egreedy=egreedy,
                          egreedy_final=egreedy_final,
                          egreedy_decay=egreedy_decay,
@@ -46,6 +49,11 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
                          optimizer=optimizer,
                          memory_size=memory_size,
                          batch_size=batch_size,
+                         per_alpha=per_alpha,
+                         per_beta=per_beta,
+                         per_beta_increment=per_beta_increment,
+                         per_epsilon=per_epsilon,
+                         per_variant=per_variant,
                          target_net_update_steps=target_net_update_steps,
                          clip_error=clip_error
                          )
@@ -66,14 +74,14 @@ class DuelingDetDQN_RL_Agent(DoubleDetDQN_RL_Agent):
 
         def __init_NN__(self, seed, hidden_layers_size, activation_fn, dropout, use_batch_norm, loss_fn, optimizer, nn_learning_rate):
             return DuelingNeuralNetwork(
-                self.env.observation_space.shape[0],
-                self.env.action_space.n,
-                hidden_layers_size,
-                activation_fn,
-                nn_learning_rate,
-                dropout,
-                use_batch_norm,
-                loss_fn,
-                optimizer,
-                seed
+                input_layer_size = self.env.observation_space.shape[0],
+                output_layer_size = self.env.action_space.n,
+                hidden_layers_size = hidden_layers_size,
+                activation_fn = activation_fn,
+                learning_rate = nn_learning_rate,
+                dropout = dropout,
+                use_batch_norm = use_batch_norm,
+                loss_fn = loss_fn,
+                optimizer = optimizer,
+                seed = seed
             )
