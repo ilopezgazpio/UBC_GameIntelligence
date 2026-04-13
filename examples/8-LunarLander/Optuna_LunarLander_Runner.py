@@ -225,6 +225,15 @@ HIDDEN_LAYER_OPTIONS = {
     "128x128x128": [128, 128, 128],
 }
 
+DUELING_HIDDEN_LAYER_OPTIONS = {
+    "64x64": [64, 64],
+    "128x128": [128, 128],
+    "256x256": [256, 256],
+    "64x64x64": [64, 64, 64],
+    "128x128x128": [128, 128, 128],
+    "256x256x256": [256, 256, 256]
+}
+
 def decode_best_params(algorithm_name: str, best_params: dict) -> dict:
     params = dict(best_params)
 
@@ -234,38 +243,42 @@ def decode_best_params(algorithm_name: str, best_params: dict) -> dict:
     return params
 
 
-def resolve_params(sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
+def resolve_params(algorithm_name: str, sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
     params = dict(sampled_params)
 
-    # Decode the storage-safe categorical value into the real architecture.
-    hidden_layers_key = params["hidden_layers_size"]
-    params["hidden_layers_size"] = HIDDEN_LAYER_OPTIONS[hidden_layers_key]
+    if algorithm_name == 'dueling_det_dqn' or algorithm_name == 'dueling_stoc_dqn':
+        params["hidden_layers_size"] = DUELING_HIDDEN_LAYER_OPTIONS[params["hidden_layers_size"]]
+    else:
+        # Decode the storage-safe categorical value into the real architecture.
+        hidden_layers_key = params["hidden_layers_size"]
+        params["hidden_layers_size"] = HIDDEN_LAYER_OPTIONS[hidden_layers_key]
 
     return params
 
 
 
-def dueling_det_dqn_search_space(trial: Trial) -> Dict[str, Any]:
-    """
-    Search space for DuelingDetDQN. This contains ONLY tuned hyperparameters.
-    Constants belong in fixed_kwargs inside the registry.
-    """
+# def dueling_det_dqn_search_space(trial: Trial) -> Dict[str, Any]:
+#     """
+#     Search space for DuelingDetDQN. This contains ONLY tuned hyperparameters.
+#     Constants belong in fixed_kwargs inside the registry.
+#     """
 
-    return {
-        "gamma": trial.suggest_float("gamma", 0.90, 0.999),
-        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-5, 1e-2, log=True),
-        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
-        "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
-        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
-        "hidden_layers_size": trial.suggest_categorical(
-            "hidden_layers_size",
-            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
-        ),
-        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
-        "memory_size": trial.suggest_int("memory_size", 1000, 10000),
-        "batch_size": trial.suggest_int("batch_size", 16, 128),
-        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000),
-    }
+#     return {
+#         "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+#         "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-5, 1e-2, log=True),
+#         "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+#         "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
+#         "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+#         "hidden_layers_size": trial.suggest_categorical(
+#             "hidden_layers_size",
+#             tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+#         ),
+#         "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+#         "memory_size": trial.suggest_int("memory_size", 1000, 10000),
+#         "batch_size": trial.suggest_int("batch_size", 16, 128),
+#         "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+#     }
+
 
 """
 DETERMINISTIC DQN
@@ -277,10 +290,10 @@ def deterministic_dqn_search_space(trial: Trial) -> Dict[str, Any]:
     """
 
     return {
-        "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
         "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
         "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
-        "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
         "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
         "hidden_layers_size": trial.suggest_categorical(
             "hidden_layers_size",
@@ -300,9 +313,9 @@ def stochastic_dqn_search_space(trial: Trial) -> Dict[str, Any]:
     """
 
     return {
-        "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
         "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
-        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.4, 1.0),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.7, 1.0),
         "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
         "egreedy_final": trial.suggest_float("egreedy_final", 0.001, 0.05),
         "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
@@ -314,28 +327,296 @@ def stochastic_dqn_search_space(trial: Trial) -> Dict[str, Any]:
     }
 
 
+"""
+PRIORITIZED EXPERIENCE REPLAY DETERMINISTIC DQN
+"""
+def per_det_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for PERDetDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5), 
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]), 
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"])
+    }
+
+
+"""
+PRIORITIZED EXPERIENCE REPLAY STOCHASTIC DQN
+"""
+def per_stoc_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for PERStocDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.7, 1.0),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]), 
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True),
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]) 
+    }
+
+
+"""
+NAIVE EXPERIENCE REPLAY DETERMINISTIC DQN
+"""
+def ner_det_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for ExperienceReplayDetDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5), 
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]) 
+    }
+
+
+"""
+NAIVE EXPERIENCE REPLAY STOCHASTIC DQN
+"""
+def ner_stoc_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for ExperienceReplayStocDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.7, 1.0),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]) 
+    }
+
+
+"""
+STABLE TARGET NETWORK DETERMINISTIC DQN / DOUBLE DETERMINISTIC DQN
+"""
+def stn_det_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for STNDetDQN and DoubleDetDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5), 
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]), 
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]),
+        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+    }
+
+
+"""
+STABLE TARGET NETWORK STOCHASTIC DQN
+"""
+def stn_stoc_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for STNStocDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.7, 1.0),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]),
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]),
+        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+    }
+
+"""
+DOUBLE STOCHASTIC DQN
+"""
+def double_stoc_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for DoubleStocDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_categorical("Q_learning_rate", [0.15, 0.2, 0.25, 0.3, 0.85, 0.9, 0.95, 1.0]),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]),
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]),
+        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+    }
+
+"""
+DUELING DETERMINISTIC DQN
+"""
+def dueling_det_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for DuelingDetDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(DUELING_HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5), 
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]), 
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]),
+        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+    }
+
+
+"""
+DUELING STOCHASTIC DQN
+"""
+def dueling_stoc_dqn_search_space (trial: Trial) -> Dict[str, Any]:
+    """
+    Search space for DuelingStocDQN. This contains ONLY tuned hyperparameters.
+    Constants belong in fixed_kwargs inside the registry.
+    """
+
+    return {
+        "gamma": trial.suggest_float("gamma", 0.95, 0.999),
+        "nn_learning_rate": trial.suggest_float("nn_learning_rate", 1e-4, 1e-2, log=True),
+        "Q_learning_rate": trial.suggest_float("Q_learning_rate", 0.7, 1.0),
+        "egreedy": trial.suggest_float("egreedy", 0.80, 1.0),
+        "egreedy_final": trial.suggest_float("egreedy_final", 0.005, 0.05),
+        "egreedy_decay": trial.suggest_int("egreedy_decay", 500, 5000),
+        "hidden_layers_size": trial.suggest_categorical(
+            "hidden_layers_size",
+            tuple(DUELING_HIDDEN_LAYER_OPTIONS.keys()),   # strings only
+        ),
+        "dropout": trial.suggest_float("dropout", 0.0, 0.5),
+        "memory_size": trial.suggest_int("memory_size", 40000, 60000),
+        "batch_size": trial.suggest_categorical("batch_size", [16, 32, 64, 128]),
+        "per_alpha": trial.suggest_float("per_alpha", 0.2, 0.7),
+        "per_beta": trial.suggest_float("per_beta", 0.2, 0.7), 
+        "per_beta_increment": trial.suggest_float("per_beta_increment", 1e-4, 1e-2, log=True),
+        "per_epsilon": trial.suggest_float("per_epsilon", 1e-3, 1e-1, log=True), 
+        "per_variant": trial.suggest_categorical("per_variant", ["proportional", "rank-based"]),
+        "target_net_update_steps": trial.suggest_int("target_net_update_steps", 100, 1000)
+    }
+
+
 
 """
 General Algorithm Registry
 """
 
 ALGORITHM_REGISTRY: Dict[str, AlgorithmSpec] = {
-    "dueling_det_dqn": AlgorithmSpec(
-        name="dueling_det_dqn",
-        agent_import_path=(
-            "SimpleBaselines.agent.rl_agents.DuelingDetDQN_RL_Agent."
-            "DuelingDetDQN_RL_Agent"
-        ),
-        search_space=dueling_det_dqn_search_space,
-        resolve_params=resolve_params,
-        fixed_kwargs={
-            "activation_fn": nn.Tanh,
-            "use_batch_norm": False,
-            "loss_fn": nn.MSELoss,
-            "optimizer": optim.Adam,
-            "clip_error": True,
-        },
-    ),
+    # "dueling_det_dqn": AlgorithmSpec(
+    #     name="dueling_det_dqn",
+    #     agent_import_path=(
+    #         "SimpleBaselines.agent.rl_agents.DuelingDetDQN_RL_Agent."
+    #         "DuelingDetDQN_RL_Agent"
+    #     ),
+    #     search_space=dueling_det_dqn_search_space,
+    #     resolve_params=resolve_params,
+    #     fixed_kwargs={
+    #         "activation_fn": nn.Tanh,
+    #         "use_batch_norm": False,
+    #         "loss_fn": nn.MSELoss,
+    #         "optimizer": optim.Adam,
+    #         "clip_error": True,
+    #     },
+    # ),
 
     "deterministic_dqn": AlgorithmSpec(
         name="deterministic_dqn",
@@ -368,6 +649,173 @@ ALGORITHM_REGISTRY: Dict[str, AlgorithmSpec] = {
             "optimizer": optim.Adam
         },
     ),
+
+    "per_det_dqn": AlgorithmSpec(
+        name="per_det_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.PERDetDQN_RL_Agent."
+            "PERDetDQN_RL_Agent"
+        ),
+        search_space=per_det_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
+        },
+    ),
+
+    "per_stoc_dqn": AlgorithmSpec(
+        name="per_stoc_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.PERStocDQN_RL_Agent."
+            "PERStocDQN_RL_Agent"
+        ),
+        search_space=per_stoc_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
+        },
+    ), 
+
+    "ner_det_dqn": AlgorithmSpec(
+        name="ner_det_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.ExperienceReplayDetDQN_RL_Agent."
+            "ExperienceReplayDetDQN_RL_Agent"
+        ),
+        search_space=ner_det_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
+        },
+    ),
+
+    "ner_stoc_dqn": AlgorithmSpec(
+        name="ner_stoc_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.ExperienceReplayStocDQN_RL_Agent."
+            "ExperienceReplayStocDQN_RL_Agent"
+        ),
+        search_space=ner_stoc_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam
+        },
+    ), 
+
+    "stn_det_dqn": AlgorithmSpec(
+        name="stn_det_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.STNDetDQN_RL_Agent."
+            "STNDetDQN_RL_Agent"
+        ),
+        search_space=stn_det_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    ),
+
+    "stn_stoc_dqn": AlgorithmSpec(
+        name="stn_stoc_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.STNStocDQN_RL_Agent."
+            "STNStocDQN_RL_Agent"
+        ),
+        search_space=stn_stoc_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    ),
+    
+    "double_det_dqn": AlgorithmSpec(
+        name="double_det_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.DoubleDetDQN_RL_Agent."
+            "DoubleDetDQN_RL_Agent"
+        ),
+        search_space=stn_det_dqn_search_space, # mismos hiperparámetros que Stable Target Network
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    ),
+
+    "double_stoc_dqn": AlgorithmSpec(
+        name="double_stoc_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.DoubleStocDQN_RL_Agent."
+            "DoubleStocDQN_RL_Agent"
+        ),
+        search_space=double_stoc_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    ), 
+
+    "dueling_det_dqn": AlgorithmSpec(
+        name="dueling_det_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.DuelingDetDQN_RL_Agent."
+            "DuelingDetDQN_RL_Agent"
+        ),
+        search_space=dueling_det_dqn_search_space,
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    ),
+
+    "dueling_stoc_dqn": AlgorithmSpec(
+        name="dueling_stoc_dqn",
+        agent_import_path=(
+            "SimpleBaselines.agent.rl_agents.DuelingStocDQN_RL_Agent."
+            "DuelingStocDQN_RL_Agent"
+        ),
+        search_space=dueling_stoc_dqn_search_space, 
+        resolve_params=resolve_params,
+        fixed_kwargs={
+            "activation_fn": nn.Tanh,
+            "use_batch_norm": False,
+            "loss_fn": nn.MSELoss,
+            "optimizer": optim.Adam,
+            "clip_error": True,
+        },
+    )
+
 }
 
 
