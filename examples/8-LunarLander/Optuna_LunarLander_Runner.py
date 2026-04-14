@@ -243,15 +243,19 @@ def decode_best_params(algorithm_name: str, best_params: dict) -> dict:
     return params
 
 
-def resolve_params(algorithm_name: str, sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
+def resolve_params(sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
     params = dict(sampled_params)
 
-    if algorithm_name == 'dueling_det_dqn' or algorithm_name == 'dueling_stoc_dqn':
-        params["hidden_layers_size"] = DUELING_HIDDEN_LAYER_OPTIONS[params["hidden_layers_size"]]
-    else:
-        # Decode the storage-safe categorical value into the real architecture.
-        hidden_layers_key = params["hidden_layers_size"]
-        params["hidden_layers_size"] = HIDDEN_LAYER_OPTIONS[hidden_layers_key]
+    # Decode the storage-safe categorical value into the real architecture.
+    hidden_layers_key = params["hidden_layers_size"]
+    params["hidden_layers_size"] = HIDDEN_LAYER_OPTIONS[hidden_layers_key]
+
+    return params
+
+def resolve_params_dueling(sampled_params: Mapping[str, Any]) -> Dict[str, Any]:
+    params = dict(sampled_params)
+
+    params["hidden_layers_size"] = DUELING_HIDDEN_LAYER_OPTIONS[params["hidden_layers_size"]]
 
     return params
 
@@ -789,7 +793,7 @@ ALGORITHM_REGISTRY: Dict[str, AlgorithmSpec] = {
             "DuelingDetDQN_RL_Agent"
         ),
         search_space=dueling_det_dqn_search_space,
-        resolve_params=resolve_params,
+        resolve_params=resolve_params_dueling,
         fixed_kwargs={
             "activation_fn": nn.Tanh,
             "use_batch_norm": False,
@@ -806,7 +810,7 @@ ALGORITHM_REGISTRY: Dict[str, AlgorithmSpec] = {
             "DuelingStocDQN_RL_Agent"
         ),
         search_space=dueling_stoc_dqn_search_space, 
-        resolve_params=resolve_params,
+        resolve_params=resolve_params_dueling,
         fixed_kwargs={
             "activation_fn": nn.Tanh,
             "use_batch_norm": False,
